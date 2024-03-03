@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "352249299975",
+    "project_id": "test-7643a",
+    "storage_bucket": "test-7643a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:352249299975:android:a27600ec3856f9244796a2",
+        "android_client_info": {
+          "package_name": "com.example.fire"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAWeTYXA4xQVd_IU9Xpb7HLgkwnYwg3WU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:352249299975:android:57b70033d9712aad4796a2",
+        "android_client_info": {
+          "package_name": "com.example.mybackfourapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAWeTYXA4xQVd_IU9Xpb7HLgkwnYwg3WU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
