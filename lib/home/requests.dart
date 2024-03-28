@@ -154,7 +154,11 @@ class _RequestScreenState extends State<RequestScreen> {
                                                 .showSnackBar(
                                               const SnackBar(
                                                 content: Text(
+<<<<<<< HEAD
                                                   'request, accepted.',
+=======
+                                                  'User added as friend',
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),

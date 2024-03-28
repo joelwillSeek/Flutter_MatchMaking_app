@@ -1,4 +1,9 @@
 import 'dart:async';
+<<<<<<< HEAD
+=======
+import 'dart:convert';
+
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:bottom_picker/resources/arrays.dart';
 import 'package:fire/pages/sign_in.dart';
@@ -9,8 +14,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+<<<<<<< HEAD
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+=======
+import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import '../services/FirebaseService.dart';
 import '../sign_up componenets/PhoneNumberRegistration.dart';
 
@@ -42,6 +52,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return null;
   }
 
+<<<<<<< HEAD
   void _showPermissionDeniedDialog() {
     showDialog(
       context: context,
@@ -79,10 +90,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     } else {
       _showPermissionDeniedDialog();
+=======
+  Future<void> _getImageFromGallery() async {
+    final imagePicker = ImagePicker();
+    final pickedImage =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = File(pickedImage.path);
+      });
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
     }
   }
 
   Future<void> _getImageFromCamera() async {
+<<<<<<< HEAD
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool cameraPermission =
         sharedPreferences.getBool('camera_permission') ?? false;
@@ -99,6 +122,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     } else {
       _showPermissionDeniedDialog();
       Permission.photos.request();
+=======
+    final imagePicker = ImagePicker();
+    final pickedImage = await imagePicker.pickImage(source: ImageSource.camera);
+
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = File(pickedImage.path);
+      });
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
     }
   }
 
@@ -575,7 +607,11 @@ class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
 
 // ignore: camel_case_types, must_be_immutable
 class credentialEmPas extends StatefulWidget {
+<<<<<<< HEAD
   final String? f, l, gen, ph, bio;
+=======
+  final String? f, l, gen, ph;
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   final File? img;
   List<String> selectedInterests = [];
   final int age;
@@ -588,8 +624,12 @@ class credentialEmPas extends StatefulWidget {
       required this.img,
       required this.ph,
       required this.selectedInterests,
+<<<<<<< HEAD
       required this.age,
       required this.bio});
+=======
+      required this.age});
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 
   @override
   State<credentialEmPas> createState() => _credentialEmPasState();
@@ -626,10 +666,51 @@ class _credentialEmPasState extends State<credentialEmPas> {
 
   final formKey = GlobalKey<FormState>();
   final FirebaseService firebaseService = FirebaseService();
+<<<<<<< HEAD
+=======
+  final String key = "pk.6951b17d4c0867cfb96cf435d31b471f";
+  var uuid = Uuid();
+  List<dynamic> _placelist = [];
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 
   @override
   void initState() {
     super.initState();
+<<<<<<< HEAD
+=======
+    searchLoc.addListener(_onSearchLocationChanged);
+  }
+
+  void _onSearchLocationChanged() {
+    final input = searchLoc.text;
+    if (input.isNotEmpty) {
+      _fetchLocationSuggestions(input);
+    }
+  }
+
+  Future<void> _fetchLocationSuggestions(String input) async {
+    String baseURL =
+        'https://api.locationiq.com/v1/autocomplete.php?key=$key&q=$input&limit=5';
+    String request = '$baseURL&city=Addis%20Ababa';
+    var response = await http.get(Uri.parse(request));
+    print(response.body.toString());
+    if (response.statusCode == 200) {
+      final List<dynamic> predictions = jsonDecode(response.body.toString());
+      List<dynamic> filteredPredictions = [];
+      predictions.forEach((prediction) {
+        // Check if the prediction is a sub-city within Addis Ababa
+        if (prediction['type'] == 'suburb' &&
+            prediction['address']['city'] == 'Addis Ababa') {
+          filteredPredictions.add(prediction['display_place']);
+        }
+      });
+      setState(() {
+        _placelist = filteredPredictions;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   }
 
   @override
@@ -710,6 +791,10 @@ class _credentialEmPasState extends State<credentialEmPas> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
                   controller: searchLoc,
+<<<<<<< HEAD
+=======
+                  onChanged: (_) => _onSearchLocationChanged(),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                   decoration: InputDecoration(
                     labelText: 'Location',
                     hintText: 'Type to search for a location',
@@ -717,6 +802,10 @@ class _credentialEmPasState extends State<credentialEmPas> {
                   ),
                 ),
               ),
+<<<<<<< HEAD
+=======
+              _buildLocationSuggestions(),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -829,6 +918,32 @@ class _credentialEmPasState extends State<credentialEmPas> {
     );
   }
 
+<<<<<<< HEAD
+=======
+  Widget _buildLocationSuggestions() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: _placelist.length,
+        itemBuilder: (context, index) {
+          final prediction = _placelist[index];
+          return ListTile(
+            title: Text(prediction),
+            onTap: () {
+              // Handle suggestion selection
+              // You may want to populate the text field with the selected suggestion
+              // and clear the suggestion list.
+              searchLoc.text = prediction;
+              setState(() {
+                _placelist = [];
+              });
+            },
+          );
+        },
+      ),
+    );
+  }
+
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   @override
   void dispose() {
     emailCont.dispose();

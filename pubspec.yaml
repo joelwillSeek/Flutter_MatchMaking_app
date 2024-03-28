@@ -49,16 +49,23 @@ dependencies:
   line_icons: ^2.0.3
   flutter_tinder_swipe: ^0.0.4
   like_button: ^2.0.5
+<<<<<<< HEAD
   intl: 0.18.1
+=======
+  intl: ^0.19.0
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   google_fonts: ^6.1.0
   shared_preferences: ^2.2.2
   bottom_picker: ^2.4.0
   http: 
   uuid: ^4.3.2
+<<<<<<< HEAD
   feedback: ^3.0.1
   permission_handler: ^11.3.0
   flutter_vibrate: ^1.3.0
   local_auth: ^2.2.0
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   
 dev_dependencies:
   flutter_test:

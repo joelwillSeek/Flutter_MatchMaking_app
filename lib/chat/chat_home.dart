@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:fire/model/message.dart';
 import 'package:fire/services/ChatServices.dart';
+<<<<<<< HEAD
 import 'package:fire/services/FirebaseService.dart';
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +14,11 @@ import '../services/FirestoreFetcher.dart';
 import 'chat_room.dart';
 
 class ChatHome extends StatelessWidget {
+<<<<<<< HEAD
   ChatHome({Key? key}) : super(key: key);
+=======
+  const ChatHome({Key? key}) : super(key: key);
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 
   Future<void> _refresh(BuildContext context) {
     return Future.delayed(
@@ -23,6 +30,7 @@ class ChatHome extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD
   final FirebaseService _firebaseService = FirebaseService();
   Future<bool> _deleteFriend(
       BuildContext context, String toBeDeletedUserID) async {
@@ -34,6 +42,8 @@ class ChatHome extends StatelessWidget {
     }
   }
 
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,29 +85,51 @@ class ChatHome extends StatelessWidget {
                           ),
                         );
                       },
+<<<<<<< HEAD
                       onDeletePressed: () async {
                         // Implement delete logic here
                         // For now, just show a confirmation dialog
                         bool? deleted = await showDialog<bool>(
+=======
+                      onDeletePressed: () {
+                        // Implement delete logic here
+                        // For now, just show a confirmation dialog
+                        showDialog(
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text("Delete Chat"),
                               content: Text(
+<<<<<<< HEAD
                                   "Are you sure you want to delete this chat? You will never match with this user again."),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context)
                                         .pop(false); // Cancelled
+=======
+                                  "Are you sure you want to delete this chat?"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                                   },
                                   child: Text("Cancel"),
                                 ),
                                 TextButton(
+<<<<<<< HEAD
                                   onPressed: () async {
                                     bool deletionResult = await _deleteFriend(
                                         context, friend.user_id);
                                     Navigator.of(context).pop(deletionResult);
+=======
+                                  onPressed: () {
+                                    // Perform delete action
+                                    // Add your logic here
+                                    Navigator.of(context).pop();
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                                   },
                                   child: Text("Delete"),
                                 ),
@@ -105,6 +137,7 @@ class ChatHome extends StatelessWidget {
                             );
                           },
                         );
+<<<<<<< HEAD
 
                         if (deleted!) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -124,6 +157,8 @@ class ChatHome extends StatelessWidget {
                             ),
                           );
                         }
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                       },
                     );
                   },
@@ -153,6 +188,7 @@ class ChatListItem extends StatefulWidget {
   _ChatListItemState createState() => _ChatListItemState();
 }
 
+<<<<<<< HEAD
 class _ChatListItemState extends State<ChatListItem>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
@@ -162,6 +198,12 @@ class _ChatListItemState extends State<ChatListItem>
   String? lastChat; // Holds the last chat message
   String subtitleText = 'no Recent chat'; // Default subtitle text
   bool isNewMessage = false;
+=======
+class _ChatListItemState extends State<ChatListItem> {
+  bool isOnline = false; // Initially set to false
+  String? lastChat; // Holds the last chat message
+  String subtitleText = 'no Recent chat'; // Default subtitle text
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   final ChatServices _chatServices = ChatServices();
   late StreamSubscription<Message?> _lastChatSubscription;
   late StreamSubscription<List<Message>> _newMessageSubscription;
@@ -169,6 +211,7 @@ class _ChatListItemState extends State<ChatListItem>
   @override
   void initState() {
     super.initState();
+<<<<<<< HEAD
     _controller = AnimationController(
       duration: Duration(milliseconds: 1000),
       vsync: this,
@@ -193,6 +236,8 @@ class _ChatListItemState extends State<ChatListItem>
 
     _controller.repeat();
 
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
     // Listen to changes in the friend's online status
     FirestoreFetcher()
         .streamOnlineStatus(widget.friend.user_id)
@@ -216,10 +261,13 @@ class _ChatListItemState extends State<ChatListItem>
           } else {
             subtitleText = '♨️ New message';
           }
+<<<<<<< HEAD
           lastChat = lastMessage.message; // Update last chat with new message
           _controller.reset(); // Reset animation controller
           _controller.repeat(); // Start animation
           isNewMessage = true; // Start color animation
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
         });
       }
     });
@@ -231,15 +279,23 @@ class _ChatListItemState extends State<ChatListItem>
     )
         .listen((message) {
       setState(() {
+<<<<<<< HEAD
         updateSubtitle(message);
         isNewMessage = false; // Update subtitle based on last message
+=======
+        lastChat = message?.message;
+        updateSubtitle(message);
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
       });
     });
   }
 
   @override
   void dispose() {
+<<<<<<< HEAD
     _controller.dispose();
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
     _lastChatSubscription.cancel();
     _newMessageSubscription.cancel();
     super.dispose();
@@ -261,6 +317,7 @@ class _ChatListItemState extends State<ChatListItem>
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
+<<<<<<< HEAD
         leading: Stack(
           children: [
             CircleAvatar(
@@ -276,10 +333,32 @@ class _ChatListItemState extends State<ChatListItem>
                   shape: BoxShape.circle,
                   color: isOnline ? Colors.green : Colors.red,
                 ),
+=======
+        leading: CircleAvatar(
+          backgroundImage: NetworkImage(widget.friend.profileImageUrl),
+        ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              widget.friend.firstName,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            // Dot indicator for online status
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isOnline ? Colors.green : Colors.red,
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
               ),
             ),
           ],
         ),
+<<<<<<< HEAD
         title: Text(
           widget.friend.firstName,
           style: TextStyle(
@@ -299,6 +378,9 @@ class _ChatListItemState extends State<ChatListItem>
                 : Text(subtitleText);
           },
         ),
+=======
+        subtitle: Text(subtitleText),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
         trailing: PopupMenuButton(
           icon: Icon(Icons.more_vert),
           itemBuilder: (BuildContext context) => <PopupMenuEntry>[

@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fire/chat/chat_home.dart';
+<<<<<<< HEAD
 import 'package:fire/manager/ThemeProvider.dart';
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import 'package:fire/model/message.dart';
 import 'package:fire/services/ChatServices.dart';
 import 'package:fire/services/FirestoreFetcher.dart';
@@ -10,7 +13,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+<<<<<<< HEAD
 import 'package:provider/provider.dart';
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 
 class ChatRoom extends StatefulWidget {
   final Person friend;
@@ -25,6 +31,10 @@ class _ChatRoomState extends State<ChatRoom> {
   final ChatServices _chatServices = ChatServices();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   File? _image;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   void sendMessage() async {
     if (messageController.text.isNotEmpty || _image != null) {
       await _chatServices.sendMessage(
@@ -58,9 +68,14 @@ class _ChatRoomState extends State<ChatRoom> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
+=======
+    return Scaffold(
+      backgroundColor: Colors.white,
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
       body: Column(
         children: [
           Padding(
@@ -69,8 +84,15 @@ class _ChatRoomState extends State<ChatRoom> {
               children: [
                 GestureDetector(
                   onTap: () {
+<<<<<<< HEAD
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => ChatHome()));
+=======
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChatHome()));
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                   },
                   child: Icon(
                     Icons.arrow_back_ios_new_outlined,
@@ -87,9 +109,13 @@ class _ChatRoomState extends State<ChatRoom> {
                 Text(
                   widget.friend.firstName,
                   style: TextStyle(
+<<<<<<< HEAD
                     color: themeProvider.themeMode == ThemeModeType.Dark
                         ? Colors.green
                         : Colors.black,
+=======
+                    color: Colors.black,
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                     fontSize: 20.0,
                     fontWeight: FontWeight.w500,
                   ),
@@ -122,9 +148,13 @@ class _ChatRoomState extends State<ChatRoom> {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
+<<<<<<< HEAD
                   color: themeProvider.themeMode == ThemeModeType.Dark
                       ? Colors.grey[800]
                       : Colors.white,
+=======
+                  color: Colors.white,
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Row(
@@ -150,12 +180,18 @@ class _ChatRoomState extends State<ChatRoom> {
                             onPressed: () async {
                               final picker = ImagePicker();
                               final pickedFile = await picker.pickImage(
+<<<<<<< HEAD
                                 source: ImageSource.gallery,
+=======
+                                source: ImageSource
+                                    .gallery, // Pick image from gallery
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                               );
                               if (pickedFile != null) {
                                 setState(() {
                                   _image = File(pickedFile.path);
                                 });
+<<<<<<< HEAD
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
@@ -166,6 +202,16 @@ class _ChatRoomState extends State<ChatRoom> {
                                       },
                                     );
                                   },
+=======
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'image selected, now tap send button',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor: Colors.green,
+                                  ),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                                 );
                               }
                             },
@@ -384,6 +430,7 @@ class _ChatRoomState extends State<ChatRoom> {
     return formattedTime;
   }
 }
+<<<<<<< HEAD
 
 class SelectedImageDialog extends StatelessWidget {
   final File imageFile;
@@ -426,3 +473,5 @@ class SelectedImageDialog extends StatelessWidget {
     );
   }
 }
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76

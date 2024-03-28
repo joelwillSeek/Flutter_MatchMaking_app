@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 // ignore_for_file: unnecessary_null_comparison
 
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import 'dart:io';
 
 import 'package:fire/sign_up%20componenets/PhoneVerificationScreen.dart';
@@ -55,6 +58,7 @@ class PhoneNumberRegistrationForm extends StatefulWidget {
 class _PhoneNumberRegistrationFormState
     extends State<PhoneNumberRegistrationForm> {
   TextEditingController _phoneNumberController = TextEditingController();
+<<<<<<< HEAD
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -150,6 +154,99 @@ class _PhoneNumberRegistrationFormState
           ),
         ),
       ],
+=======
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'My mobile',
+            style: GoogleFonts.lora(
+              fontSize: 30.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10.0),
+          Text(
+            'Please enter your valid phone number. We will send you a 6-digit code to verify your account.',
+            style: GoogleFonts.lora(
+              fontSize: 16.0,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(height: 20.0),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+              border: Border.all(
+                color: Colors.grey[400]!,
+                width: 1.0,
+              ),
+            ),
+            child: Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: 15.0, top: 5.0, bottom: 5.0, right: 5.0),
+                  child: Text(
+                    '(+251) |',
+                    style: GoogleFonts.lora(fontSize: 16.0),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 5.0),
+                    child: TextField(
+                      controller: _phoneNumberController,
+                      decoration: InputDecoration(
+                        hintText: '912345678',
+                        hintStyle: GoogleFonts.lora(),
+                        labelStyle: GoogleFonts.lora(),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                      ),
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 20.0),
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 30),
+              child: ElevatedButton(
+                onPressed: () {
+                  _validatePhoneNumber(context);
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    Color(0xFFE94057),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15.0),
+                  child: Text(
+                    'Continue',
+                    style: GoogleFonts.lora(
+                        fontSize: 18.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
     );
   }
 
@@ -160,16 +257,30 @@ class _PhoneNumberRegistrationFormState
     } else if (phoneNumber.length != 9) {
       _showSnackBar(context, 'Please input a proper phone number.');
     } else {
+<<<<<<< HEAD
       phoneNumber = "+251$phoneNumber";
       print('Processing phone number: $phoneNumber');
       print("fname ${widget.f} \n ln ${widget.l} \n gender ${widget.gen}");
+=======
+      // Process the phone number, e.g., send verification code
+      phoneNumber = "+251$phoneNumber";
+      print('Processing phone number: $phoneNumber');
+      print("fname ${widget.f} \n ln ${widget.l} \n gender ${widget.gen}");
+
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => PhoneVerificationScreen(
+<<<<<<< HEAD
             f: widget.f!,
             l: widget.l!,
             gen: widget.gen!,
+=======
+            f: widget.f,
+            l: widget.l,
+            gen: widget.gen,
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
             img: widget.img,
             ph: phoneNumber,
             age: widget.age,

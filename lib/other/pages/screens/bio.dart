@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import 'package:fire/services/FirestoreFetcher.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +10,13 @@ class Info extends StatefulWidget {
     Key? key,
     required this.selectedPerson,
   }) : super(key: key);
+=======
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class Info extends StatefulWidget {
+  const Info({Key? key}) : super(key: key);
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 
   @override
   State<Info> createState() => _InfoState();
@@ -25,7 +33,13 @@ class _InfoState extends State<Info> {
           Container(
             width: double.infinity,
             height: 1325 * fem,
+<<<<<<< HEAD
             decoration: BoxDecoration(),
+=======
+            decoration: BoxDecoration(
+              color: Color(0xffffffff),
+            ),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
             child: Stack(
               children: [
                 Positioned(
@@ -39,8 +53,12 @@ class _InfoState extends State<Info> {
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         fit: BoxFit.cover,
+<<<<<<< HEAD
                         image:
                             NetworkImage(widget.selectedPerson.profileImageUrl),
+=======
+                        image: AssetImage("assets/images/girls/img_5.jpg"),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                       ),
                     ),
                     child: Container(
@@ -78,6 +96,10 @@ class _InfoState extends State<Info> {
                       height: 939 * fem,
                       child: Container(
                         decoration: BoxDecoration(
+<<<<<<< HEAD
+=======
+                          color: Color(0xffffffff),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(30 * fem),
                             topRight: Radius.circular(30 * fem),
@@ -443,7 +465,11 @@ class _InfoState extends State<Info> {
                                     width: 225 * fem,
                                     height: 36 * fem,
                                     child: Text(
+<<<<<<< HEAD
                                       '${widget.selectedPerson.firstName} ${widget.selectedPerson.lastName}, 29',
+=======
+                                      'Selam Yohannes, 29',
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                                       style: GoogleFonts.lora(
                                         fontSize: 24 * ffem,
                                         fontWeight: FontWeight.w700,

@@ -48,6 +48,10 @@ class _ExplorePageState extends State<ExplorePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< HEAD
+=======
+      backgroundColor: white,
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
       body: Stack(
         children: [
           Positioned(
@@ -152,10 +156,14 @@ class _ExplorePageState extends State<ExplorePage> {
                     onTap: () {
                       Navigator.push(
                         context,
+<<<<<<< HEAD
                         MaterialPageRoute(
                             builder: (context) => Info(
                                   selectedPerson: itemsTemp[i],
                                 )),
+=======
+                        MaterialPageRoute(builder: (context) => const Info()),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                       );
                     },
                     child: SwipeCard(
@@ -332,6 +340,10 @@ class _ExplorePageState extends State<ExplorePage> {
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: 120,
+<<<<<<< HEAD
+=======
+              decoration: BoxDecoration(color: white),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),

@@ -12,7 +12,11 @@ class _chatState extends State<chat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< HEAD
       body: ChatHome(),
+=======
+      body: const ChatHome(),
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
     );
   }
 }

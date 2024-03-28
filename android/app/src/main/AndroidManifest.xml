@@ -1,8 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<<<<<<< HEAD
  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
 <uses-permission android:name="android.permission.VIBRATE" />
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
     <application
         android:label="fire"
         android:name="${applicationName}"

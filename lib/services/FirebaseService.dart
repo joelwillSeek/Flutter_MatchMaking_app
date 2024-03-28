@@ -251,6 +251,7 @@ class FirebaseService {
       print('lastSeen updating for user: $userID\n$error');
     }
   }
+<<<<<<< HEAD
 
   Future<void> deleteChatFriend(String toBeDeletedUserID) async {
     String currentUserID = FirebaseAuth.instance.currentUser!.uid;
@@ -270,4 +271,6 @@ class FirebaseService {
       print("Error deleting document: $error");
     });
   }
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 }

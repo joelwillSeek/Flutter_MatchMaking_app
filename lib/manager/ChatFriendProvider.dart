@@ -34,6 +34,7 @@ class ChatFriendProvider with ChangeNotifier {
     _isFetching = false;
     notifyListeners();
   }
+<<<<<<< HEAD
 
   void removeChatFriend(Person friend) {
     // Remove the friend from the list
@@ -41,4 +42,6 @@ class ChatFriendProvider with ChangeNotifier {
     // Notify listeners that the list has changed
     notifyListeners();
   }
+=======
+>>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 }
