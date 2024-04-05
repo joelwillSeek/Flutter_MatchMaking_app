@@ -1,10 +1,6 @@
 import 'dart:io';
 
-<<<<<<< HEAD
 import 'package:fire/sign_up%20componenets/biography.dart';
-=======
-import 'package:fire/pages/sign_up.dart';
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import 'package:flutter/material.dart';
 
 class InterestSelectionScreen extends StatefulWidget {
@@ -141,11 +137,7 @@ class _InterestSelectionScreenState extends State<InterestSelectionScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-<<<<<<< HEAD
                           builder: (context) => Bio(
-=======
-                          builder: (context) => credentialEmPas(
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                             f: widget.f,
                             l: widget.l,
                             gen: widget.gen,

@@ -1,27 +1,17 @@
-<<<<<<< HEAD
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:feedback/feedback.dart';
-=======
-import 'package:cloud_firestore/cloud_firestore.dart';
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import 'package:fire/data/account_json.dart';
 import 'package:fire/main.dart';
 import 'package:fire/manager/ChangeNotifier.dart';
 import 'package:fire/services/FirebaseService.dart';
-<<<<<<< HEAD
 import 'package:fire/services/report.dart';
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import 'package:fire/theme/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
-<<<<<<< HEAD
 import 'package:google_fonts/google_fonts.dart';
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
@@ -42,7 +32,6 @@ class _AccountPageState extends State<AccountPage> {
         );
   }
 
-<<<<<<< HEAD
   void submitFeedback(BuildContext context) async {
     BetterFeedback.of(context).show(
       (UserFeedback feedback) async {
@@ -74,8 +63,6 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +70,6 @@ class _AccountPageState extends State<AccountPage> {
       body: Stack(
         children: [
           getBody(context),
-<<<<<<< HEAD
           Padding(
             padding: const EdgeInsets.only(top: 40.0, left: 10.0, bottom: 10),
             child: GestureDetector(
@@ -102,8 +88,6 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
           ),
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
           Positioned(
             top: 0,
             right: 0,
@@ -141,11 +125,7 @@ class _AccountPageState extends State<AccountPage> {
             return Container(
               width: size.width,
               height: size.height * 0.60,
-<<<<<<< HEAD
               decoration: BoxDecoration(boxShadow: [
-=======
-              decoration: BoxDecoration(color: white, boxShadow: [
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                 BoxShadow(
                   color: grey.withOpacity(0.1),
                   spreadRadius: 10,
@@ -290,11 +270,7 @@ class _AccountPageState extends State<AccountPage> {
                                 height: 10,
                               ),
                               Text(
-<<<<<<< HEAD
                                 "About Me",
-=======
-                                "ADD MEDIA",
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,

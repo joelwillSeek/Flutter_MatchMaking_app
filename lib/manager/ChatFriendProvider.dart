@@ -13,11 +13,19 @@ class ChatFriendProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Fetch chat friends data from Firestore
-      _chatFriends = await FirestoreFetcher().fetchFriends();
-      sortChatFriendsByLastClicked(); // Sort the list after fetching
+      _isFetching = true;
+      notifyListeners();
+      List<Person> fetchedFriends = await FirestoreFetcher().fetchFriends();
+      if (fetchedFriends.isNotEmpty) {
+        _chatFriends = fetchedFriends;
+        sortChatFriendsByLastClicked();
+      } else {
+        _isFetching = false;
+        notifyListeners();
+      }
     } catch (e) {
-      // Handle error
+      _isFetching = false;
+      notifyListeners();
     } finally {
       _isFetching = false;
       notifyListeners();
@@ -34,7 +42,6 @@ class ChatFriendProvider with ChangeNotifier {
     _isFetching = false;
     notifyListeners();
   }
-<<<<<<< HEAD
 
   void removeChatFriend(Person friend) {
     // Remove the friend from the list
@@ -42,6 +49,4 @@ class ChatFriendProvider with ChangeNotifier {
     // Notify listeners that the list has changed
     notifyListeners();
   }
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 }

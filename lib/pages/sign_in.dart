@@ -1,5 +1,6 @@
 import 'package:fire/pages/home.dart';
 import 'package:fire/pages/sign_up.dart';
+import 'package:fire/services/SocialMediaSignInOption.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,9 @@ class signin extends StatefulWidget {
 
 // ignore: camel_case_types
 class _signinState extends State<signin> {
+  final SocialMediaSignInOption _socialMediaSignInOption =
+      SocialMediaSignInOption();
+  void _loginWithFb() async {}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +48,6 @@ class _signinState extends State<signin> {
                   textAlign: TextAlign.center,
                 ),
                 const signinForm(),
-                // Add a spacer to push the following content to the bottom
                 const SizedBox(
                   height: 150,
                 ),
@@ -66,14 +69,19 @@ class _signinState extends State<signin> {
                         color: Color(0xFFE94057),
                       ),
                       onPressed: () {
-                        // Google sign-in logic
+                        _loginWithFb();
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.apple,
-                          size: 60, color: Color(0xFFE94057)),
-                      onPressed: () {
-                        // Apple sign-in logic
+                      icon: Image.asset(
+                        'assets/images/icons8-google-48.png',
+                        width: 60.0,
+                        height: 60.0,
+                        color: Color(0xFFE94057),
+                      ),
+                      onPressed: () async {
+                        await _socialMediaSignInOption
+                            .signInWithGoogle(context);
                       },
                     ),
                   ],
@@ -230,7 +238,6 @@ class _signinFormState extends State<signinForm> {
             child: ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
-                  // Validation passed, proceed with login
                   showDialog(
                     context: context,
                     barrierDismissible: false,

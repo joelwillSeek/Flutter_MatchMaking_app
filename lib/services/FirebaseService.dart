@@ -48,6 +48,7 @@ class FirebaseService {
     required String firstName,
     required String lastName,
     required String gender,
+    required bool verified,
     File? profilePic,
   }) async {
     try {
@@ -59,8 +60,9 @@ class FirebaseService {
 
       User? user = userCredential.user;
       if (user != null) {
-        await user.sendEmailVerification();
-
+        if (verified == false) {
+          await user.sendEmailVerification();
+        }
         await _storeUserDetails(
           userId: user.uid,
           email: email,
@@ -107,8 +109,7 @@ class FirebaseService {
         'userID': userId,
         'post_date': DateTime.now(),
         'profile_type': 'user',
-        'profile_url':
-            '', // You can update this later with the profile picture URL
+        'profile_url': '',
       });
       print("User profile stored successfully!");
     } catch (e) {
@@ -138,6 +139,33 @@ class FirebaseService {
     } catch (e) {
       print("Error uploading profile picture: $e");
     }
+  }
+
+  Future<void> CreatingAccountWithotherSignInMethod({
+    required String userId,
+    required String p_url,
+    required String email,
+    required String firstName,
+    required String lastName,
+    required String gender,
+  }) async {
+    await _firestore.collection('f_user').doc(userId).set({
+      'firstName': firstName,
+      'lastName': lastName,
+      'gender': gender,
+      'email': email,
+      'user_id': userId,
+      'isOnline': false,
+      'lastSeen': Timestamp.now(),
+    });
+    print("User details stored successfully!");
+    await _firestore.collection('user_profile').doc(userId).set({
+      'userID': userId,
+      'post_date': DateTime.now(),
+      'profile_type': 'user',
+      'profile_url': p_url,
+    });
+    print("User profile stored successfully!");
   }
 
   Future<void> addLike({
@@ -251,7 +279,6 @@ class FirebaseService {
       print('lastSeen updating for user: $userID\n$error');
     }
   }
-<<<<<<< HEAD
 
   Future<void> deleteChatFriend(String toBeDeletedUserID) async {
     String currentUserID = FirebaseAuth.instance.currentUser!.uid;
@@ -271,6 +298,4 @@ class FirebaseService {
       print("Error deleting document: $error");
     });
   }
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 }

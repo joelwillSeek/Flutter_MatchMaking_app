@@ -1,9 +1,10 @@
 import 'package:fire/services/FirebaseService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../manager/RequestProvider.dart';
-// Import your Person class
 
 class RequestScreen extends StatefulWidget {
   const RequestScreen({Key? key}) : super(key: key);
@@ -42,7 +43,11 @@ class _RequestScreenState extends State<RequestScreen> {
         builder: (context, requestProvider, child) {
           return requestProvider.isLoading
               ? Center(
-                  child: CircularProgressIndicator(),
+                  child: SpinKitSpinningLines(
+                    size: 80.0,
+                    itemCount: 5,
+                    color: const Color(0xFFE94057),
+                  ),
                 )
               : requestProvider.requests.isNotEmpty
                   ? GridView.builder(
@@ -154,11 +159,7 @@ class _RequestScreenState extends State<RequestScreen> {
                                                 .showSnackBar(
                                               const SnackBar(
                                                 content: Text(
-<<<<<<< HEAD
                                                   'request, accepted.',
-=======
-                                                  'User added as friend',
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
                                                   style: TextStyle(
                                                       color: Colors.white),
                                                 ),
@@ -206,7 +207,17 @@ class _RequestScreenState extends State<RequestScreen> {
                       },
                     )
                   : Center(
-                      child: Text('No requests found'),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset('assets/images/urban-dog.gif'),
+                          Text(
+                            'No requests found',
+                            style: GoogleFonts.lato(
+                                fontSize: 15, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
                     );
         },
       ),

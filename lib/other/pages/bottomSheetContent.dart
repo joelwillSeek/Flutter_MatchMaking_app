@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-<<<<<<< HEAD
 import 'package:provider/provider.dart';
 
 import '../../manager/ThemeProvider.dart';
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
 
 class FilterBottomSheet extends StatefulWidget {
   final String selectedGender;
@@ -38,10 +35,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     final themeProvider = Provider.of<ThemeProvider>(context);
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -279,7 +273,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     ),
                   ),
                 ),
-<<<<<<< HEAD
                 SizedBox(height: 10),
                 Center(
                   child: Column(
@@ -296,8 +289,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     ],
                   ),
                 ),
-=======
->>>>>>> 2e9195651c5f68ffb5d31115dfa0f794f9487a76
               ],
             ),
           ),

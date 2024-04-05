@@ -20,7 +20,6 @@ class RequestProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       print('Error fetching requests: $e');
-      // Handle the error accordingly
     }
   }
 
