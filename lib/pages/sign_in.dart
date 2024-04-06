@@ -20,7 +20,7 @@ class signin extends StatefulWidget {
 class _signinState extends State<signin> {
   final SocialMediaSignInOption _socialMediaSignInOption =
       SocialMediaSignInOption();
-  void _loginWithFb() async {}
+  //void _loginWithFb() async {}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,8 +68,9 @@ class _signinState extends State<signin> {
                         size: 60,
                         color: Color(0xFFE94057),
                       ),
-                      onPressed: () {
-                        _loginWithFb();
+                      onPressed: () async {
+                        await _socialMediaSignInOption
+                            .signInWithFacebook(context);
                       },
                     ),
                     IconButton(
