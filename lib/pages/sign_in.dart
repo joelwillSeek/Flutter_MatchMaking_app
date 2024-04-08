@@ -75,6 +75,27 @@ class _signinState extends State<signin> {
                     ),
                     IconButton(
                       icon: Image.asset(
+                        'assets/images/icons8-twitter-48.png',
+                        width: 70.0,
+                        height: 70.0,
+                        color: Color(0xFFE94057),
+                      ),
+                      onPressed: () async {
+                        await _socialMediaSignInOption.signInWithX(context);
+                      },
+                    ),
+                    // IconButton(
+                    //   icon: const Icon(
+                    //     Icons.apple,
+                    //     size: 60,
+                    //     color: Color(0xFFE94057),
+                    //   ),
+                    //   onPressed: () async {
+                    //     await _socialMediaSignInOption.signInWithApple(context);
+                    //   },
+                    // ),
+                    IconButton(
+                      icon: Image.asset(
                         'assets/images/icons8-google-48.png',
                         width: 60.0,
                         height: 60.0,

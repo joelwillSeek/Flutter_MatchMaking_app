@@ -60,6 +60,9 @@ dependencies:
   permission_handler: ^11.3.0
   flutter_vibrate: ^1.3.0
   flutter_facebook_auth: 
+  the_apple_sign_in: ^1.1.1
+  twitter_login: ^4.4.2
+  
   
 dev_dependencies:
   flutter_test:

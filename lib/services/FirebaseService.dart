@@ -142,12 +142,12 @@ class FirebaseService {
   }
 
   Future<void> CreatingAccountWithotherSignInMethod({
-    required String userId,
-    required String p_url,
-    required String email,
-    required String firstName,
-    required String lastName,
-    required String gender,
+    String? userId,
+    String? p_url,
+    String? email,
+    String? firstName,
+    String? lastName,
+    String? gender,
   }) async {
     await _firestore.collection('f_user').doc(userId).set({
       'firstName': firstName,

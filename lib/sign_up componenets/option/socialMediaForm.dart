@@ -483,7 +483,7 @@ class otherInfo extends StatefulWidget {
 
   otherInfo(
       {super.key,
-      required this.userData,
+      this.userData,
       required this.bio,
       required this.selectedGender,
       required this.selectedInterests});
@@ -735,24 +735,26 @@ class _otherInfoState extends State<otherInfo> {
                         );
                       },
                     );
+                    print("started");
                     await firebaseService.CreatingAccountWithotherSignInMethod(
-                        userId: widget.userData!.userId,
-                        p_url: widget.userData!.profilePicUrl!,
-                        email: widget.userData!.email!,
-                        firstName: widget.userData!.firstName!,
-                        lastName: widget.userData!.lastName!,
-                        gender: widget.selectedGender!);
+                      userId: widget.userData?.userId,
+                      p_url: widget.userData?.profilePicUrl,
+                      email: widget.userData?.email,
+                      firstName: widget.userData?.firstName,
+                      lastName: widget.userData?.lastName,
+                      gender: widget.selectedGender,
+                    );
                     Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => HomeScreen()),
                     );
                     print("user details");
-                    print(widget.userData!.email);
-                    print(widget.userData!.firstName);
-                    print(widget.userData!.phoneNumber);
-                    print(widget.userData!.profilePicUrl);
-                    print(widget.userData!.emailVerified);
+                    print(widget.userData?.email);
+                    print(widget.userData?.firstName);
+                    print(widget.userData?.phoneNumber);
+                    print(widget.userData?.profilePicUrl);
+                    print(widget.userData?.emailVerified);
                     print(widget.bio);
                     print(widget.selectedGender);
                     print("age = $age");
