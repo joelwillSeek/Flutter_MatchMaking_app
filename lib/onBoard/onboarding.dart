@@ -46,6 +46,7 @@ class _OnBoardState extends State<OnBoard> {
         PageController(initialPage: _currentIndex, viewportFraction: 0.8);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _requestPermissions();
+      requestNotificationPermission();
     });
   }
 
@@ -59,6 +60,22 @@ class _OnBoardState extends State<OnBoard> {
     int isViewed = 0;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setInt("onBoard", isViewed);
+  }
+
+  Future<void> requestNotificationPermission() async {
+    final PermissionStatus status = await Permission.notification.request();
+
+    if (status.isGranted) {
+      print('Notification permission granted');
+    } else if (status.isDenied) {
+      print('Notification permission denied');
+
+      await openAppSettings();
+    } else if (status.isPermanentlyDenied) {
+      print('Notification permission permanently denied');
+    } else if (status.isRestricted) {
+      print('Notification permission restricted');
+    }
   }
 
   Future<void> _requestPermissions() async {
@@ -140,12 +157,10 @@ class _OnBoardState extends State<OnBoard> {
                   backgroundColor: Color(0xFFE94057),
                   padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                   textStyle: TextStyle(fontSize: 20),
-                  minimumSize:
-                      const Size(305, 50), 
+                  minimumSize: const Size(305, 50),
                   elevation: 8,
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(10), 
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 child: Text(
@@ -242,8 +257,7 @@ class _OnBoardState extends State<OnBoard> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Container(
-              width: MediaQuery.of(context).size.width -
-                  40, // screen width - horizontal padding
+              width: MediaQuery.of(context).size.width - 40,
               child: Text(
                 data.description,
                 textAlign: TextAlign.center,

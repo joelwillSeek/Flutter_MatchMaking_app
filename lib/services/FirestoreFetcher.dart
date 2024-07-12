@@ -7,8 +7,14 @@ class Person {
   String lastName;
   String gender;
   String email;
+  String address;
+  String bio;
+  String deviceToken;
+  String? phoneNum;
+  List<dynamic> interests;
   String profileImageUrl;
   bool? isOnline;
+  int age;
   Timestamp? timestamp;
   DateTime lastClicked;
 
@@ -20,23 +26,34 @@ class Person {
       required this.email,
       required this.profileImageUrl,
       required this.lastClicked,
+      required this.age,
+      required this.bio,
+      required this.address,
+      required this.deviceToken,
+      required this.interests,
+      this.phoneNum,
       this.timestamp,
       this.isOnline});
 
-  // Factory method to create a Person object from a map
   factory Person.fromMap(Map<String, dynamic> map) {
     return Person(
       user_id: map['user_id'] ?? '',
       firstName: map['firstName'] ?? '',
       lastName: map['lastName'] ?? '',
-      gender: map['sex'] ?? '',
+      gender: map['gender'] ?? '',
       email: map['email'] ?? '',
-      isOnline: map['isOnline'] ?? '',
+      interests: map['interests'] ?? '',
+      isOnline: map['isOnline'] ?? false,
       timestamp: map['lastSeen'] ?? '',
       profileImageUrl: map['profile_url'] ?? '',
       lastClicked: map['lastClicked'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['lastClicked'])
-          : DateTime.now(), // Set current time if lastClicked is null
+          : DateTime.now(),
+      age: map['age']?.toInt() ?? 0,
+      bio: map['bio'] ?? '',
+      address: map['address'] ?? '',
+      deviceToken: map['deviceToken'] ?? '',
+      phoneNum: map['phone_number'], // Use key with underscore
     );
   }
 }
@@ -44,39 +61,39 @@ class Person {
 class FirestoreFetcher {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  Future<List<Person>> fetchUsersAndProfiles() async {
-    try {
-      User? user = _auth.currentUser;
-      String userId = user!.uid;
-      final QuerySnapshot<Map<String, dynamic>> usersSnapshot = await _firestore
-          .collection('f_user')
-          .where('user_id', isNotEqualTo: userId)
-          .get();
-      final QuerySnapshot<Map<String, dynamic>> profilesSnapshot =
-          await _firestore.collection('user_profile').get();
+  // Future<List<Person>> fetchUsersAndProfiles() async {
+  //   try {
+  //     User? user = _auth.currentUser;
+  //     String userId = user!.uid;
+  //     final QuerySnapshot<Map<String, dynamic>> usersSnapshot = await _firestore
+  //         .collection('f_user')
+  //         .where('user_id', isNotEqualTo: userId)
+  //         .get();
+  //     final QuerySnapshot<Map<String, dynamic>> profilesSnapshot =
+  //         await _firestore.collection('user_profile').get();
 
-      final List<Person> usersAndProfiles = [];
+  //     final List<Person> usersAndProfiles = [];
 
-      // Merge user data with profile data based on userID
-      for (final userDoc in usersSnapshot.docs) {
-        final userId = userDoc['user_id'];
+  //     // Merge user data with profile data based on userID
+  //     for (final userDoc in usersSnapshot.docs) {
+  //       final userId = userDoc['user_id'];
 
-        final profileDoc = profilesSnapshot.docs.firstWhere(
-          (profileDoc) => profileDoc['userID'] == userId,
-        );
+  //       final profileDoc = profilesSnapshot.docs.firstWhere(
+  //         (profileDoc) => profileDoc['userID'] == userId,
+  //       );
 
-        final userData = userDoc.data();
-        final profileData = profileDoc.data();
-        final person = Person.fromMap({...userData, ...profileData});
-        usersAndProfiles.add(person);
-      }
+  //       final userData = userDoc.data();
+  //       final profileData = profileDoc.data();
+  //       final person = Person.fromMap({...userData, ...profileData});
+  //       usersAndProfiles.add(person);
+  //     }
 
-      return usersAndProfiles;
-    } catch (e) {
-      print('Error fetching users and profiles: $e');
-      return []; // Return an empty list in case of error
-    }
-  }
+  //     return usersAndProfiles;
+  //   } catch (e) {
+  //     print('Error fetching users and profiles: $e');
+  //     return []; // Return an empty list in case of error
+  //   }
+  // }
 
   Future<List<Person>> fetchRequests() async {
     try {
@@ -101,13 +118,7 @@ class FirestoreFetcher {
             (await _firestore.collection('f_user').doc(requesterId).get())
                 .data();
         print('User data for requester ID $requesterId: $userData');
-
-        final profileData =
-            (await _firestore.collection('user_profile').doc(requesterId).get())
-                .data();
-        print('Profile data for requester ID $requesterId: $profileData');
-
-        final person = Person.fromMap({...userData!, ...profileData!});
+        final person = Person.fromMap(userData!);
         requesters.add(person);
       }
 
@@ -123,7 +134,6 @@ class FirestoreFetcher {
       User? user = _auth.currentUser;
       String userId = user!.uid;
 
-      // Query friend IDs from Chat_Friend collection
       final QuerySnapshot<Map<String, dynamic>> friendsSnapshot =
           await _firestore
               .collection('Chat_Friend')
@@ -136,18 +146,10 @@ class FirestoreFetcher {
         final friendId = friendDoc['Chat_FriendID'];
         print('Fetching details for friend ID: $friendId');
 
-        // Fetch user data from f_user collection
         final userData =
             (await _firestore.collection('f_user').doc(friendId).get()).data();
         print('User data for friend ID $friendId: $userData');
-
-        // Fetch profile data from user_profile collection
-        final profileData =
-            (await _firestore.collection('user_profile').doc(friendId).get())
-                .data();
-        print('Profile data for friend ID $friendId: $profileData');
-
-        final person = Person.fromMap({...userData!, ...profileData!});
+        final person = Person.fromMap({...userData!});
         friends.add(person);
       }
 
@@ -162,18 +164,11 @@ class FirestoreFetcher {
         final friendId = friendDoc['current_userID'];
         print('Fetching details for inverse friend ID: $friendId');
 
-        // Fetch user data from f_user collection
         final userData =
             (await _firestore.collection('f_user').doc(friendId).get()).data();
         print('User data for inverse friend ID $friendId: $userData');
 
-        // Fetch profile data from user_profile collection
-        final profileData =
-            (await _firestore.collection('user_profile').doc(friendId).get())
-                .data();
-        print('Profile data for inverse friend ID $friendId: $profileData');
-
-        final person = Person.fromMap({...userData!, ...profileData!});
+        final person = Person.fromMap(userData!);
         friends.add(person);
       }
 

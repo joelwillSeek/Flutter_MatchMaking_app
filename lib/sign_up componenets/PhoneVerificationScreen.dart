@@ -286,6 +286,15 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                     onTap: _isResendClickable
                         ? () {
                             _resendOTP();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'resending, please wait a few second!',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
                           }
                         : null,
                     child: Text(

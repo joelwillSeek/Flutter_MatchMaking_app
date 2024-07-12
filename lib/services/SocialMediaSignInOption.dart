@@ -1,4 +1,5 @@
 import 'package:fire/pages/home.dart';
+import 'package:fire/services/FirebaseService.dart';
 import 'package:fire/sign_up%20componenets/option/socialMediaForm.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +19,7 @@ class SocialMediaSignInOption {
     redirectURI: 'socialauth://',
   );
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseService firebaseService = FirebaseService();
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
@@ -44,7 +46,11 @@ class SocialMediaSignInOption {
 
           if (docSnapshot.exists) {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => HomeScreen()));
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            ).then((value) {
+              firebaseService.updateDeviceToken(user.uid);
+            });
           } else {
             final userData = UserData(
               userId: user.uid,
@@ -135,7 +141,10 @@ class SocialMediaSignInOption {
 
             if (docSnapshot.exists) {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()));
+                      MaterialPageRoute(builder: (context) => HomeScreen()))
+                  .then((value) {
+                firebaseService.updateDeviceToken(user.uid);
+              });
             } else {
               final userData = UserData(
                 userId: user.uid,

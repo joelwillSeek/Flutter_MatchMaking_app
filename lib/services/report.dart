@@ -74,4 +74,27 @@ class Report {
       print("Error uploading profile picture: $e");
     }
   }
+
+  Future<bool> reportAbuse(
+      {required String reporterName,
+      required String accusedFullName,
+      required String accusedUID,
+      required String reason}) async {
+    try {
+      String c_userID = _auth.currentUser!.uid;
+      String? c_userEmail = _auth.currentUser!.email;
+      await _firestore.collection('Report').doc(c_userID).set({
+        'Reported_By': reporterName,
+        'problem': reason,
+        'ReporterUID': c_userID,
+        'email': c_userEmail,
+        'accused_UserFullName': accusedFullName,
+        'accusedUID': accusedUID,
+        'Reported_On': Timestamp.now(),
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

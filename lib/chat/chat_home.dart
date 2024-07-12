@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:fire/manager/SettingsProvider.dart';
+import 'package:fire/manager/UserDataManager.dart';
 import 'package:fire/model/message.dart';
 import 'package:fire/services/ChatServices.dart';
 import 'package:fire/services/FirebaseService.dart';
+import 'package:fire/services/report.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -54,9 +57,17 @@ class _ChatHomeState extends State<ChatHome> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<SettingsProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Messages'),
+        title: Text('Messages',
+            style: TextStyle(
+                fontFamily: 'Merienda',
+                color: themeProvider.isDarkMode
+                    ? Colors.white
+                    : Colors.grey[900])),
+        backgroundColor:
+            themeProvider.isDarkMode ? Colors.grey[900] : Colors.white,
       ),
       body: Container(
         margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
@@ -64,7 +75,7 @@ class _ChatHomeState extends State<ChatHome> {
           builder: (context, provider, child) {
             provider.chatFriends
                 .sort((a, b) => b.lastClicked.compareTo(a.lastClicked));
-            // Display loading spinner if fetching
+
             if (provider.isFetching) {
               return Center(
                 child: SpinKitWave(
@@ -74,7 +85,6 @@ class _ChatHomeState extends State<ChatHome> {
               );
             }
 
-            // Display chat list if available
             if (provider.chatFriends.isNotEmpty) {
               return RefreshIndicator(
                 onRefresh: () => _refresh(context),
@@ -135,7 +145,112 @@ class _ChatHomeState extends State<ChatHome> {
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Failed to delete chat'),
+                              content: Text('Chat deletion canceled(402)'),
+                            ),
+                          );
+                        }
+                      },
+                      onReport: () async {
+                        final bool? reportResult = await showDialog<bool>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            TextEditingController _reportController =
+                                TextEditingController();
+                            bool _isSubmitEnabled = false;
+
+                            void _checkSubmitEnabled() {
+                              if (_reportController.text.split(' ').length >=
+                                  10) {
+                                _isSubmitEnabled = true;
+                              } else {
+                                _isSubmitEnabled = false;
+                              }
+                            }
+
+                            return StatefulBuilder(
+                              builder: (context, setState) {
+                                return AlertDialog(
+                                  title: Text("Report on ${friend.firstName}"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                          "Write a description of what you want to report on this user (minimum 10 words)."),
+                                      TextField(
+                                        controller: _reportController,
+                                        maxLines: 5,
+                                        onChanged: (text) {
+                                          setState(() {
+                                            _checkSubmitEnabled();
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText:
+                                              "Enter report description...",
+                                          errorText: _isSubmitEnabled
+                                              ? null
+                                              : "Minimum 10 words required",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                      child: Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: _isSubmitEnabled
+                                          ? () async {
+                                              final me = UserDataManager().me!;
+                                              final reporterName =
+                                                  "${me.firstName} ${me.lastName}";
+                                              final accusedFullName =
+                                                  friend.firstName +
+                                                      ' ' +
+                                                      friend.lastName;
+                                              final accusedUID = friend.user_id;
+                                              final reason =
+                                                  _reportController.text;
+
+                                              bool reportResult =
+                                                  await Report().reportAbuse(
+                                                reporterName: reporterName,
+                                                accusedFullName:
+                                                    accusedFullName,
+                                                accusedUID: accusedUID,
+                                                reason: reason,
+                                              );
+
+                                              Navigator.of(context)
+                                                  .pop(reportResult);
+                                            }
+                                          : null,
+                                      child: Text("Submit"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        );
+
+                        if (reportResult != null && reportResult) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Thanks for reporting, we will review your report.',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.deepPurple[400],
+                            ),
+                          );
+                        } else if (reportResult != null && !reportResult) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Report canceled (403)'),
                             ),
                           );
                         }
@@ -172,13 +287,14 @@ class ChatListItem extends StatefulWidget {
   final Person friend;
   final VoidCallback onTap;
   final VoidCallback onDeletePressed;
-
-  const ChatListItem({
-    Key? key,
-    required this.friend,
-    required this.onTap,
-    required this.onDeletePressed,
-  }) : super(key: key);
+  final VoidCallback onReport;
+  const ChatListItem(
+      {Key? key,
+      required this.friend,
+      required this.onTap,
+      required this.onDeletePressed,
+      required this.onReport})
+      : super(key: key);
 
   @override
   _ChatListItemState createState() => _ChatListItemState();
@@ -188,7 +304,7 @@ class _ChatListItemState extends State<ChatListItem>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Color?> _colorAnimation;
-
+  final int maxLength = 25;
   bool isOnline = false; // Initially set to false
   String? lastChat; // Holds the last chat message
   String subtitleText = 'no Recent chat'; // Default subtitle text
@@ -242,9 +358,11 @@ class _ChatListItemState extends State<ChatListItem>
       if (messages.isNotEmpty) {
         setState(() {
           final lastMessage = messages.first;
-          if (lastMessage.photoURL != null) {
+          if (lastMessage.photoURL != null && lastMessage.isSeen == false) {
+            print("status of the new msg === ${lastMessage.isSeen}");
             subtitleText = '📷 New photo';
-          } else {
+          } else if (lastMessage.isSeen == false) {
+            print("status of the new msg === ${lastMessage.isSeen}");
             subtitleText = '♨️ New message';
           }
           lastChat = lastMessage.message; // Update last chat with new message
@@ -282,6 +400,8 @@ class _ChatListItemState extends State<ChatListItem>
       subtitleText = 'no Recent chat';
     } else if (message.photoURL != null) {
       subtitleText = '📷 Photo';
+    } else if (message.message.length > maxLength) {
+      subtitleText = '${message.message.substring(0, maxLength)}...';
     } else {
       subtitleText = message.message;
     }
@@ -289,6 +409,7 @@ class _ChatListItemState extends State<ChatListItem>
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<SettingsProvider>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
@@ -314,8 +435,9 @@ class _ChatListItemState extends State<ChatListItem>
         title: Text(
           widget.friend.firstName,
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+              fontWeight: FontWeight.bold,
+              color:
+                  themeProvider.isDarkMode ? Colors.white : Colors.grey[900]),
         ),
         subtitle: AnimatedBuilder(
           animation: _colorAnimation,
@@ -327,16 +449,32 @@ class _ChatListItemState extends State<ChatListItem>
                       color: _colorAnimation.value,
                     ),
                   )
-                : Text(subtitleText);
+                : Text(
+                    subtitleText,
+                    style: TextStyle(
+                        color: themeProvider.isDarkMode
+                            ? Colors.white
+                            : Colors.grey[900]),
+                  );
           },
         ),
         trailing: PopupMenuButton(
-          icon: Icon(Icons.more_vert),
+          icon: Icon(Icons.more_vert,
+              color:
+                  themeProvider.isDarkMode ? Colors.white : Colors.grey[900]),
           itemBuilder: (BuildContext context) => <PopupMenuEntry>[
             PopupMenuItem(
-              child: ListTile(
-                title: Text("Delete"),
-                onTap: widget.onDeletePressed,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text("Delete"),
+                    onTap: widget.onDeletePressed,
+                  ),
+                  ListTile(
+                    title: Text("Report"),
+                    onTap: widget.onReport,
+                  ),
+                ],
               ),
             ),
           ],

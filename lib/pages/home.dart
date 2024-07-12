@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fire/manager/ChangeNotifier.dart';
 import 'package:fire/other/account.dart';
 import 'package:fire/other/pages/explore.dart';
 import 'package:fire/services/FirebaseService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fire/home/chat.dart';
+import 'package:http/http.dart' as http;
 //import 'package:fire/home/profile.dart';
 import 'package:fire/home/requests.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -18,13 +21,51 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _selectedIndex = 0;
   FirebaseService firebaseService = FirebaseService();
-
   final List<Widget> _tabs = [
     FeedNavigator(),
     RequestNavigator(),
     ChatNavigator(),
     ProfileNavigator(),
   ];
+
+  Future<bool> isConnectedToInternet() async {
+    try {
+      final response = await http.get(Uri.parse('https://google.com'));
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
+  void checkConnection() async {
+    bool isConnected = await isConnectedToInternet();
+    if (isConnected) {
+      // Perform actions that require internet
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'back to online',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 21, 234, 88),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'no internet connection',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 249, 21, 21),
+        ),
+      );
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -37,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     // Add observer to listen for lifecycle changes
     WidgetsBinding.instance.addObserver(this);
+    Provider.of<ProfileProvider>(context, listen: false).fetchAndSetUserData();
   }
 
   @override
@@ -49,7 +91,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    // Perform your operations based on the app lifecycle state
     switch (state) {
       case AppLifecycleState.paused:
         // App is in the background
@@ -61,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       case AppLifecycleState.resumed:
         // App is in the foreground
         print("continued");
+        checkConnection();
         firebaseService.updateIsOnline(
             FirebaseAuth.instance.currentUser!.uid, true);
         firebaseService.updateLastSeen(

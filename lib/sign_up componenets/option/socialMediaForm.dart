@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:bottom_picker/resources/arrays.dart';
 import 'package:fire/pages/home.dart';
@@ -329,12 +331,12 @@ class prefs extends StatefulWidget {
 
 class _prefsState extends State<prefs> {
   List<String> interests = [
-    "Traveling",
-    "Reading",
-    "Cooking",
-    "Photography",
-    "Fitness",
-    "Gardening",
+    "Friendship",
+    "Buisness",
+    "Entrepreneur",
+    "Soulmate",
+    "Employment",
+    "Student",
     "Painting",
     "Music",
     "Coding",
@@ -504,6 +506,7 @@ class otherInfo extends StatefulWidget {
 
 class _otherInfoState extends State<otherInfo> {
   String? _selectedSubCity, dob;
+  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
 
   void _openDatePicker(BuildContext context) {
     BottomPicker.date(
@@ -547,6 +550,32 @@ class _otherInfoState extends State<otherInfo> {
     }
 
     return years;
+  }
+
+  Future<void> createAccount(int age) async {
+    final FirebaseService firebaseService = FirebaseService();
+    isLoading.value = true;
+    print("started");
+    await firebaseService.CreatingAccountWithotherSignInMethod(
+        userId: widget.userData?.userId,
+        p_url: widget.userData?.profilePicUrl,
+        email: widget.userData?.email,
+        firstName: widget.userData?.firstName,
+        lastName: widget.userData?.lastName,
+        gender: widget.selectedGender,
+        address: _selectedSubCity,
+        age: age,
+        bio: widget.bio,
+        interests: widget.selectedInterests,
+        phoneNum: widget.userData?.phoneNumber);
+    isLoading.value = false;
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
+    ).then((value) {
+      firebaseService.updateDeviceToken(widget.userData!.userId!);
+    });
   }
 
   @override
@@ -623,7 +652,7 @@ class _otherInfoState extends State<otherInfo> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      hint: Text("example gerji,addis ababa"),
+                      hint: Text("example Bole,addis ababa"),
                       value: _selectedSubCity,
                       icon: Icon(Icons.arrow_drop_down),
                       iconSize: 24,
@@ -695,73 +724,59 @@ class _otherInfoState extends State<otherInfo> {
                       );
                       return;
                     }
-                    final FirebaseService firebaseService = FirebaseService();
+                    createAccount(age);
+                    // showDialog(
+                    //   context: context,
+                    //   barrierDismissible: false,
+                    //   builder: (BuildContext context) {
+                    //     return const Center(
+                    //       child: Column(
+                    //         mainAxisAlignment: MainAxisAlignment.center,
+                    //         crossAxisAlignment: CrossAxisAlignment.center,
+                    //         children: [
+                    //           SpinKitWaveSpinner(
+                    //             size: 50.0,
+                    //             color: Color(0xFFE94057),
+                    //             trackColor: Colors.amber,
+                    //             waveColor: Color(0xFFE94057),
+                    //           ),
+                    //           SizedBox(
+                    //               height:
+                    //                   20), // Add some spacing below the spinner
+                    //           Flexible(
+                    //             child: Padding(
+                    //               padding: EdgeInsets.symmetric(horizontal: 20),
+                    //               child: Text(
+                    //                 "creating account few a sec left...",
+                    //                 textAlign: TextAlign
+                    //                     .center, // Center the text horizontally
+                    //                 style: TextStyle(
+                    //                   color: Colors.white,
+                    //                   fontWeight: FontWeight.w700,
+                    //                   fontSize: 16,
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     );
+                    //   },
+                    // );
 
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SpinKitWaveSpinner(
-                                size: 50.0,
-                                color: Color(0xFFE94057),
-                                trackColor: Colors.amber,
-                                waveColor: Color(0xFFE94057),
-                              ),
-                              SizedBox(
-                                  height:
-                                      20), // Add some spacing below the spinner
-                              Flexible(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(
-                                    "creating account few a sec left...",
-                                    textAlign: TextAlign
-                                        .center, // Center the text horizontally
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                    print("started");
-                    await firebaseService.CreatingAccountWithotherSignInMethod(
-                      userId: widget.userData?.userId,
-                      p_url: widget.userData?.profilePicUrl,
-                      email: widget.userData?.email,
-                      firstName: widget.userData?.firstName,
-                      lastName: widget.userData?.lastName,
-                      gender: widget.selectedGender,
-                    );
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                    print("user details");
-                    print(widget.userData?.email);
-                    print(widget.userData?.firstName);
-                    print(widget.userData?.phoneNumber);
-                    print(widget.userData?.profilePicUrl);
-                    print(widget.userData?.emailVerified);
-                    print(widget.bio);
-                    print(widget.selectedGender);
-                    print("age = $age");
-                    for (int i = 0; i <= widget.selectedInterests.length; i++) {
-                      print(widget.selectedInterests[i]);
-                    }
-                    print(_selectedSubCity);
+                    // print("user details");
+                    // print(widget.userData?.email);
+                    // print(widget.userData?.firstName);
+                    // print(widget.userData?.phoneNumber);
+                    // print(widget.userData?.profilePicUrl);
+                    // print(widget.userData?.emailVerified);
+                    // print(widget.bio);
+                    // print(widget.selectedGender);
+                    // print("age = $age");
+                    // for (int i = 0; i <= widget.selectedInterests.length; i++) {
+                    //   print(widget.selectedInterests[i]);
+                    // }
+                    // print(_selectedSubCity);
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -770,7 +785,53 @@ class _otherInfoState extends State<otherInfo> {
                     elevation: 8,
                   ),
                   child: Text("finish")),
-            )
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: isLoading,
+              builder: (context, value, child) {
+                if (value) {
+                  return Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SpinKitWaveSpinner(
+                              size: 50.0,
+                              color: Color(0xFFE94057),
+                              trackColor: Colors.amber,
+                              waveColor: Color(0xFFE94057),
+                            ),
+                            SizedBox(
+                                height:
+                                    20), // Add some spacing below the spinner
+                            Flexible(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Text(
+                                  "creating account few a sec left...",
+                                  textAlign: TextAlign
+                                      .center, // Center the text horizontally
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ),
           ],
         ),
       ),

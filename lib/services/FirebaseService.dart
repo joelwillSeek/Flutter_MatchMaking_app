@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +8,7 @@ class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   Future<User?> signInWithEmailAndPassword({
     required String email,
@@ -19,6 +20,7 @@ class FirebaseService {
         password: password,
       );
       updateIsOnline(_auth.currentUser!.uid, true);
+      updateDeviceToken(_auth.currentUser!.uid);
       return userCredential.user;
     } catch (e) {
       print("Error signing in: $e");
@@ -48,6 +50,11 @@ class FirebaseService {
     required String firstName,
     required String lastName,
     required String gender,
+    required String Bio,
+    required String phoneNum,
+    required List<String> interests,
+    required int age,
+    required String address,
     required bool verified,
     File? profilePic,
   }) async {
@@ -57,19 +64,22 @@ class FirebaseService {
         email: email,
         password: password,
       );
-
       User? user = userCredential.user;
       if (user != null) {
         if (verified == false) {
           await user.sendEmailVerification();
         }
         await _storeUserDetails(
-          userId: user.uid,
-          email: email,
-          firstName: firstName,
-          lastName: lastName,
-          gender: gender,
-        );
+            userId: user.uid,
+            email: email,
+            firstName: firstName,
+            lastName: lastName,
+            gender: gender,
+            address: address,
+            interests: interests,
+            age: age,
+            phoneNum: phoneNum,
+            bio: Bio);
 
         if (profilePic != null) {
           await _uploadProfilePicture(userId: user.uid, profilePic: profilePic);
@@ -85,33 +95,74 @@ class FirebaseService {
     }
   }
 
-  Future<void> _storeUserDetails({
-    required String userId,
-    required String email,
-    required String firstName,
-    required String lastName,
-    required String gender,
-  }) async {
+  Future<void> _storeUserDetails(
+      {required String userId,
+      required String email,
+      required String firstName,
+      required String lastName,
+      required String gender,
+      required String phoneNum,
+      required List<String> interests,
+      required int age,
+      required String address,
+      required String bio}) async {
+    String prefGen;
+    if (gender == "Male") {
+      prefGen = "Female";
+    } else {
+      prefGen = "Male";
+    }
+
+    String? fcmToken;
+
     try {
+      fcmToken = await messaging.getToken();
+      print('FCM Token: $fcmToken');
+    } on Exception catch (e) {
+      print(e);
+    }
+
+    try {
+      await _firestore
+          .collection('f_user')
+          .doc(userId)
+          .collection('preferences')
+          .doc(userId)
+          .set({});
       await _firestore.collection('f_user').doc(userId).set({
         'firstName': firstName,
+        'deviceToken': fcmToken,
         'lastName': lastName,
         'gender': gender,
         'email': email,
         'user_id': userId,
+        'age': age,
+        'phoneNumber': phoneNum,
+        'bio': bio,
+        'address': address,
         'isOnline': false,
-        'lastSeen': Timestamp.now(),
-      });
-      print("User details stored successfully!");
-
-      // Store user profile in separate collection
-      await _firestore.collection('user_profile').doc(userId).set({
-        'userID': userId,
-        'post_date': DateTime.now(),
-        'profile_type': 'user',
+        'notificationsEnabled': true,
         'profile_url': '',
-      });
-      print("User profile stored successfully!");
+        'interests': interests,
+        'lastSeen': Timestamp.now(),
+      }, SetOptions(merge: true));
+
+      await _firestore
+          .collection('f_user')
+          .doc(userId)
+          .collection('preferences')
+          .doc(userId)
+          .set({
+        'interests': interests,
+        'ageRange': {
+          'min': 15,
+          'max': 50,
+        },
+        'gender': prefGen,
+        'address': address,
+      }, SetOptions(merge: true));
+
+      print("User details stored successfully!");
     } catch (e) {
       print("Error storing user details: $e");
     }
@@ -129,8 +180,7 @@ class FirebaseService {
 
       String downloadURL = await storageReference.getDownloadURL();
 
-      // Update profile URL in Firestore
-      await _firestore.collection('user_profile').doc(userId).update({
+      await _firestore.collection('f_user').doc(userId).update({
         'profile_url': downloadURL,
       });
 
@@ -141,28 +191,79 @@ class FirebaseService {
     }
   }
 
-  Future<void> CreatingAccountWithotherSignInMethod({
-    String? userId,
-    String? p_url,
-    String? email,
-    String? firstName,
-    String? lastName,
-    String? gender,
-  }) async {
-    await _firestore.collection('f_user').doc(userId).set({
-      'firstName': firstName,
-      'lastName': lastName,
-      'gender': gender,
-      'email': email,
-      'user_id': userId,
-      'isOnline': false,
-      'lastSeen': Timestamp.now(),
-    });
+  Future<void> CreatingAccountWithotherSignInMethod(
+      {String? userId,
+      String? p_url,
+      String? email,
+      String? firstName,
+      String? lastName,
+      String? gender,
+      String? phoneNum,
+      List<String>? interests,
+      int? age,
+      String? address,
+      String? bio}) async {
+    String prefGen;
+    if (gender == "Male") {
+      prefGen = "Female";
+    } else {
+      prefGen = "Male";
+    }
+
+    String? fcmToken;
+
+    try {
+      fcmToken = await messaging.getToken();
+      print('FCM Token: $fcmToken');
+    } on Exception catch (e) {
+      print(e);
+    }
+    try {
+      await _firestore
+          .collection('f_user')
+          .doc(userId)
+          .collection('preferences')
+          .doc(userId)
+          .set({});
+
+      await _firestore.collection('f_user').doc(userId).set({
+        'firstName': firstName,
+        'lastName': lastName,
+        'gender': gender,
+        'email': email ?? 'habeshaly01@gmail.com',
+        'user_id': userId,
+        'age': age,
+        'phoneNumber': phoneNum ?? '+25134918291',
+        'bio': bio,
+        'deviceToken': fcmToken,
+        'address': address,
+        'interests': interests,
+        'isOnline': false,
+        'notificationsEnabled': true,
+        'profile_url': '',
+        'lastSeen': Timestamp.now(),
+      }, SetOptions(merge: true));
+
+      await _firestore
+          .collection('f_user')
+          .doc(userId)
+          .collection('preferences')
+          .doc(userId)
+          .set({
+        'interests': interests,
+        'ageRange': {
+          'min': 15,
+          'max': 50,
+        },
+        'gender': prefGen,
+        'address': address,
+      }, SetOptions(merge: true));
+    } on Exception catch (e) {
+      print(e);
+    }
+
     print("User details stored successfully!");
-    await _firestore.collection('user_profile').doc(userId).set({
-      'userID': userId,
-      'post_date': DateTime.now(),
-      'profile_type': 'user',
+    await _firestore.collection('f_user').doc(userId).update({
       'profile_url': p_url,
     });
     print("User profile stored successfully!");
@@ -181,6 +282,27 @@ class FirebaseService {
       print("Like added successfully!");
     } catch (e) {
       print("Error adding like: $e");
+    }
+  }
+
+  Future<void> updateDeviceToken(String uid) async {
+    try {
+      String? fcmToken = await messaging.getToken();
+      print('FCM Token: $fcmToken'); // For debugging purposes
+
+      if (fcmToken != null) {
+        String userId = uid;
+        await FirebaseFirestore.instance
+            .collection('f_user')
+            .doc(userId)
+            .set({'deviceToken': fcmToken}, SetOptions(merge: true));
+
+        print('Device token updated successfully');
+      } else {
+        print('FCM token is null');
+      }
+    } catch (e) {
+      print('Error updating device token: $e');
     }
   }
 
@@ -208,6 +330,7 @@ class FirebaseService {
       await _firestore.collection('Request').add({
         'a_userID': a_user,
         'r_userID': r_user,
+        'Timestamp': FieldValue.serverTimestamp(),
       });
       print("request added successfully!");
     } catch (e) {
@@ -297,5 +420,82 @@ class FirebaseService {
       // Handle errors here
       print("Error deleting document: $error");
     });
+  }
+
+  Future<bool> updatePreferences(
+      int minAge, int maxAge, String gender, String address) async {
+    String uid = _auth.currentUser!.uid;
+    try {
+      await FirebaseFirestore.instance
+          .collection('f_user')
+          .doc(uid)
+          .collection("preferences")
+          .doc(uid)
+          .update({
+        'ageRange': {
+          'min': minAge,
+          'max': maxAge,
+        },
+        'gender': gender,
+        'address': address,
+      });
+
+      // DocumentReference preferencesDoc = _firestore
+      //     .collection('users')
+      //     .doc(userId)
+      //     .collection('preferences')
+      //     .doc(userId);
+
+      // await preferencesDoc.update({
+      //   'ageRange': {
+      //     'min': minAge,
+      //     'max': maxAge,
+      //   },
+      //   'gender': gender,
+      //   'address': address,
+      // });
+      print("updated ");
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<int> updateUserProfilePicture({
+    required String userId,
+    required File newProfilePic,
+  }) async {
+    try {
+      String newImagePath = 'profile_pictures/$userId.jpg';
+      Reference newStorageReference = _storage.ref().child(newImagePath);
+
+      DocumentSnapshot userDoc =
+          await _firestore.collection('f_user').doc(userId).get();
+      if (userDoc.exists) {
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+        if (userData.containsKey('profile_url')) {
+          String oldProfileUrl = userData['profile_url'];
+          Reference oldStorageReference = _storage.refFromURL(oldProfileUrl);
+
+          await oldStorageReference.delete();
+          print("Previous profile picture deleted successfully.");
+        }
+      }
+
+      await newStorageReference.putFile(newProfilePic);
+      String newDownloadURL = await newStorageReference.getDownloadURL();
+
+      await _firestore.collection('f_user').doc(userId).update({
+        'profile_url': newDownloadURL,
+      });
+
+      print(
+          "Profile picture uploaded and updated successfully. Download URL: $newDownloadURL");
+      return 1;
+    } catch (e) {
+      print("Error updating profile picture: $e");
+      return 0;
+    }
   }
 }

@@ -13,28 +13,24 @@ class ChatServices extends ChangeNotifier {
   Future<void> sendMessage(
     String receiverID,
     String message, {
-    File? photo, // New parameter for photo file
+    File? photo,
   }) async {
     try {
       final String currentUserID = _firebaseAuth.currentUser!.uid;
       final Timestamp timestamp = Timestamp.now();
-      String? photoURL; // Variable to hold the photo URL
+      String? photoURL;
 
-      // Check if a photo is provided
       if (photo != null) {
-        // Upload photo to Firebase Storage
         final photoRef = FirebaseStorage.instance
             .ref()
             .child('chat_photos')
             .child('$currentUserID${DateTime.now()}.jpg');
         final uploadTask = photoRef.putFile(photo);
         await uploadTask.whenComplete(() async {
-          // Get photo URL after upload is complete
           photoURL = await photoRef.getDownloadURL();
         });
       }
 
-      // Create a new message with or without a photo URL
       Message newMessage = Message(
         senderID: currentUserID,
         receiverID: receiverID,
@@ -43,12 +39,10 @@ class ChatServices extends ChangeNotifier {
         photoURL: photoURL,
       );
 
-      // Determine chat room ID
       List<String> ids = [currentUserID, receiverID];
       ids.sort();
       String chatRoomID = ids.join("_");
 
-      // Add new message to Firestore
       await _firestore
           .collection('chat_rooms')
           .doc(chatRoomID)
@@ -56,7 +50,6 @@ class ChatServices extends ChangeNotifier {
           .add(newMessage.toMap());
     } catch (error) {
       print("Error sending message: $error");
-      // Handle error
     }
   }
 
@@ -112,7 +105,6 @@ class ChatServices extends ChangeNotifier {
       ids.sort();
       String chatRoomID = ids.join("_");
 
-      // Find and delete the message from Firestore using its content and timestamp
       await _firestore
           .collection('chat_rooms')
           .doc(chatRoomID)
@@ -129,7 +121,6 @@ class ChatServices extends ChangeNotifier {
       });
     } catch (error) {
       print("Error deleting message: $error");
-      // Handle error
     }
   }
 
@@ -139,7 +130,6 @@ class ChatServices extends ChangeNotifier {
       ids.sort();
       String chatRoomID = ids.join("_");
 
-      // Stream the last message between the users
       return _firestore
           .collection('chat_rooms')
           .doc(chatRoomID)
@@ -148,17 +138,14 @@ class ChatServices extends ChangeNotifier {
           .limit(1)
           .snapshots()
           .map((querySnapshot) {
-        // If there are no messages, return null
         if (querySnapshot.docs.isEmpty) {
           return null;
         }
 
-        // Return the last message
         return Message.fromFirestore(querySnapshot.docs.first);
       });
     } catch (error) {
       print("Error streaming last chat: $error");
-      // Return an empty stream in case of error
       return Stream.value(null);
     }
   }

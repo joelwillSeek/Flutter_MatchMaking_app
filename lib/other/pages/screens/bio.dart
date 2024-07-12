@@ -1,74 +1,271 @@
+import 'package:fire/manager/SettingsProvider.dart';
+import 'package:fire/manager/UserDataManager.dart';
+import 'package:fire/services/FirebaseService.dart';
 import 'package:fire/services/FirestoreFetcher.dart';
+import 'package:fire/services/NotificationService.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class Info extends StatefulWidget {
   Person selectedPerson;
+  final Function(bool) done;
   Info({
     Key? key,
     required this.selectedPerson,
+    required this.done,
   }) : super(key: key);
 
   @override
   State<Info> createState() => _InfoState();
 }
 
-class _InfoState extends State<Info> {
+class _InfoState extends State<Info> with TickerProviderStateMixin {
+  bool _showHeart = false;
+  //bool _finn = false;
+  int count = 0;
+  late String msg;
+  FirebaseService firebaseService = FirebaseService();
+  final notificationService = NotificationService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final me = UserDataManager().me!;
+
+  AnimationController? _controller;
+  Animation<double>? _scaleAnimation;
+  Animation<double>? _opacityAnimation;
+  Animation<Offset>? _positionAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.5).animate(_controller!)
+      ..addListener(() {
+        setState(() {});
+      });
+
+    _opacityAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_controller!)
+          ..addListener(() {
+            setState(() {});
+          });
+
+    _positionAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, -30),
+    ).animate(_controller!)
+      ..addListener(() {
+        setState(() {});
+      });
+  }
+
+  void liked() async {
+    if (count < 1) {
+      firebaseService.addLike(
+        likedUserID: widget.selectedPerson.user_id,
+        likerID: _auth.currentUser!.uid,
+      );
+      firebaseService.Request(
+          a_user: widget.selectedPerson.user_id,
+          r_user: _auth.currentUser!.uid);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Liked🤩',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      msg = 'you already Liked this user😎';
+      sendNotification(context, widget.selectedPerson.deviceToken, me.firstName,
+          me.profileUrl);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            msg,
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 175, 76, 101),
+        ),
+      );
+    }
+    setState(() {
+      count++;
+    });
+  }
+
+  void disliked() async {
+    if (count < 1) {
+      firebaseService.addDisLike(
+          DislikedUserID: widget.selectedPerson.user_id,
+          DislikerID: _auth.currentUser!.uid);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'disLiked👎',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+      msg = 'you already disliked this user🥱';
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            msg,
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 175, 76, 101),
+        ),
+      );
+    }
+    setState(() {
+      count++;
+    });
+  }
+
+  void _triggerHeartAnimation() {
+    print("triggred");
+    setState(() {
+      if (count < 1) {
+        liked();
+        count++;
+      }
+      _showHeart = true;
+    });
+    _controller?.forward(from: 0).then((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        setState(() {
+          _showHeart = false;
+        });
+      });
+    });
+  }
+
+  void sendNotification(BuildContext context, String receiverToken,
+      String matchedName, String profile) async {
+    notificationService.sendMatchNotification(
+        receiverToken, profile, matchedName);
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    count = 0;
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double fem = 1.0; // Assuming the value of 'fem'
+    final themeProvider = Provider.of<SettingsProvider>(context);
+    String city = widget.selectedPerson.address;
+    List<String> cty = city.split(",");
+    city = cty[0];
+    int wordCount = city.split(' ').length;
+    if (wordCount > 4) {
+      city = city.split(' ').sublist(0, 5).join(' ');
+    }
+    double fem = 1.0;
     double ffem = 0.8;
     return Scaffold(
       body: ListView(
         children: [
           Container(
             width: double.infinity,
-            height: 1325 * fem,
+            height: 900 * fem,
             decoration: BoxDecoration(),
             child: Stack(
               children: [
-                Positioned(
-                  left: 0 * fem,
-                  top: 0 * fem,
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(
-                        40 * fem, 44 * fem, 40 * fem, 44 * fem),
-                    width: 375 * fem,
-                    height: 415 * fem,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image:
-                            NetworkImage(widget.selectedPerson.profileImageUrl),
-                      ),
-                    ),
+                GestureDetector(
+                  onDoubleTap: _triggerHeartAnimation,
+                  child: Positioned(
+                    left: 0 * fem,
+                    top: 0 * fem,
                     child: Container(
-                      margin: EdgeInsets.fromLTRB(
-                          0 * fem, 0 * fem, 243 * fem, 275 * fem),
-                      padding: EdgeInsets.all(8 * fem), // Adjusted padding
-                      width: 52 * fem,
-                      height: 52 * fem,
+                      padding: EdgeInsets.fromLTRB(
+                          40 * fem, 44 * fem, 40 * fem, 44 * fem),
+                      width: 375 * fem,
+                      height: 415 * fem,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xffe8e6ea)),
-                        color: Color(0x33ffffff),
-                        borderRadius: BorderRadius.circular(15 * fem),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Center(
-                          child: Icon(
-                            Icons.arrow_back_ios_new,
-                            size: 24 * fem, // Adjust the size as needed
-                            color: Colors.white, // Adjust the color as needed
-                          ),
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                              widget.selectedPerson.profileImageUrl),
                         ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.fromLTRB(
+                                0 * fem, 0 * fem, 243 * fem, 275 * fem),
+                            padding:
+                                EdgeInsets.all(8 * fem), // Adjusted padding
+                            width: 52 * fem,
+                            height: 52 * fem,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Color(0xffe8e6ea)),
+                              color: Color(0x33ffffff),
+                              borderRadius: BorderRadius.circular(15 * fem),
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (count > 0) {
+                                    widget.done(true);
+                                  }
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: Center(
+                                child: Icon(
+                                  Icons.arrow_back_ios_new,
+                                  size: 24 * fem,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (_showHeart)
+                            Center(
+                              child: Transform.translate(
+                                offset: _positionAnimation!.value,
+                                child: Transform.scale(
+                                  scale: _scaleAnimation!.value,
+                                  child: Opacity(
+                                    opacity: _opacityAnimation!.value,
+                                    child: Icon(
+                                      Icons.favorite,
+                                      color: Colors.red,
+                                      size: 80 * fem,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
                 ),
+                // if (_showGIF)
+                //   Positioned(
+                //     top: 100,
+                //     left: 70,
+                //     child: Container(
+                //       width: 200 * fem,
+                //       height: 200 * fem,
+                //       child: Image.asset('assets/images/urban-dog.gif'),
+                //     ),
+                //   ),
                 Positioned(
                   left: 0 * fem,
                   top: 386 * fem,
@@ -91,7 +288,7 @@ class _InfoState extends State<Info> {
                 Positioned(
                   // interests2eT (309:5938)
                   left: 40 * fem,
-                  top: 791 * fem,
+                  top: 691 * fem,
                   child: Container(
                     width: 295 * fem,
                     height: 108 * fem,
@@ -99,11 +296,10 @@ class _InfoState extends State<Info> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          // interestskaT (309:5956)
                           'Interests',
                           style: GoogleFonts.lora(
-                            fontSize: 14 * ffem,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 17 * ffem,
+                            fontWeight: FontWeight.w900,
                             height: 1.5 * ffem / fem,
                             color: Color(0xffe94057),
                           ),
@@ -112,24 +308,26 @@ class _InfoState extends State<Info> {
                           height: 10 * fem,
                         ),
                         Container(
-                          // autogroupvktzsQB (TgkKRbwgjVdrhH8W67vkTZ)
                           width: double.infinity,
-                          height: 32 * fem,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                // 52P (309:5945)
-                                width: 92 * fem,
-                                height: double.infinity,
+                          height: 1,
+                          child: Wrap(
+                            spacing: 10 * fem,
+                            runSpacing: 10 * fem,
+                            children:
+                                widget.selectedPerson.interests.map((interest) {
+                              return Container(
+                                width: (295 - 20) * fem / 3,
+                                height: 32 * fem,
                                 decoration: BoxDecoration(
                                   border: Border.all(color: Color(0xffe8e6ea)),
-                                  color: Color(0xffffffff),
+                                  color: themeProvider.isDarkMode
+                                      ? Colors.black12
+                                      : Color(0xffffffff),
                                   borderRadius: BorderRadius.circular(5 * fem),
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'Music',
+                                    interest.toString(),
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.lora(
                                       fontSize: 14 * ffem,
@@ -139,119 +337,8 @@ class _InfoState extends State<Info> {
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 10 * fem,
-                              ),
-                              Container(
-                                // 52P (309:5945)
-                                width: 92 * fem,
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffe8e6ea)),
-                                  color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Coding',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.lora(
-                                      fontSize: 14 * ffem,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.5 * ffem / fem,
-                                      color: Color(0xffe94057),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 7 * fem,
-                              ),
-                              Container(
-                                // 52P (309:5945)
-                                width: 92 * fem,
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffe8e6ea)),
-                                  color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Coding',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.lora(
-                                      fontSize: 14 * ffem,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.5 * ffem / fem,
-                                      color: Color(0xffe94057),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10 * fem,
-                        ),
-                        Container(
-                          // autogroupae7q6y5 (TgkKdBSjBH9kAfXMQkaE7q)
-                          margin: EdgeInsets.fromLTRB(
-                              0 * fem, 0 * fem, 101 * fem, 0 * fem),
-                          width: double.infinity,
-                          height: 32 * fem,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                // osV (309:5942)
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 10 * fem, 0 * fem),
-                                width: 92 * fem,
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffe8e6ea)),
-                                  color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Dancing',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14 * ffem,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.5 * ffem / fem,
-                                      color: Color(0xffe94057),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                // GWB (309:5939)
-                                width: 92 * fem,
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xffe8e6ea)),
-                                  color: Color(0xffffffff),
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Modeling',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14 * ffem,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.5 * ffem / fem,
-                                      color: Color(0xffe94057),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                              );
+                            }).toList(),
                           ),
                         ),
                       ],
@@ -261,7 +348,7 @@ class _InfoState extends State<Info> {
                 Positioned(
                   // aboutYib (309:5957)
                   left: 40 * fem,
-                  top: 643 * fem,
+                  top: 619 * fem,
                   child: Container(
                     width: 279 * fem,
                     height: 118 * fem,
@@ -275,8 +362,8 @@ class _InfoState extends State<Info> {
                           child: Text(
                             'About',
                             style: GoogleFonts.lora(
-                              fontSize: 14 * ffem,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 18 * ffem,
+                              fontWeight: FontWeight.w900,
                               height: 1.5 * ffem / fem,
                               color: Color(0xffe94057),
                             ),
@@ -290,23 +377,13 @@ class _InfoState extends State<Info> {
                             maxWidth: 279 * fem,
                           ),
                           child: Text(
-                            'i am graphics designer and i want to make new friend',
+                            "'- ${widget.selectedPerson.bio}'",
                             style: GoogleFonts.inter(
-                              fontSize: 14 * ffem,
+                              fontSize: 17 * ffem,
                               fontWeight: FontWeight.w700,
                               height: 1.5 * ffem / fem,
                               color: Color(0xffe94057),
                             ),
-                          ),
-                        ),
-                        Text(
-                          // readmoreev3 (309:5958)
-                          'Read more',
-                          style: GoogleFonts.lora(
-                            fontSize: 14 * ffem,
-                            fontWeight: FontWeight.w700,
-                            height: 1.5 * ffem / fem,
-                            color: Color(0xffe94057),
                           ),
                         ),
                       ],
@@ -316,7 +393,7 @@ class _InfoState extends State<Info> {
                 Positioned(
                   // locationoY3 (309:5961)
                   left: 40 * fem,
-                  top: 563 * fem,
+                  top: 529 * fem,
                   child: Container(
                     width: 295 * fem,
                     height: 50 * fem,
@@ -326,7 +403,7 @@ class _InfoState extends State<Info> {
                         Container(
                           // autogroup9xm9Xiw (TgkL6zyhxYdkLZFKkV9Xm9)
                           margin: EdgeInsets.fromLTRB(
-                              0 * fem, 0 * fem, 114 * fem, 0 * fem),
+                              0 * fem, 0 * fem, 80 * fem, 0 * fem),
                           height: double.infinity,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,8 +415,8 @@ class _InfoState extends State<Info> {
                                 child: Text(
                                   'Location',
                                   style: GoogleFonts.lora(
-                                    fontSize: 14 * ffem,
-                                    fontWeight: FontWeight.w700,
+                                    fontSize: 17 * ffem,
+                                    fontWeight: FontWeight.w900,
                                     height: 1.5 * ffem / fem,
                                     color: Color(0xffe94057),
                                   ),
@@ -347,7 +424,7 @@ class _InfoState extends State<Info> {
                               ),
                               Text(
                                 // boleaddisababanes (309:5966)
-                                'Bole, Addis ababa',
+                                widget.selectedPerson.address,
                                 style: GoogleFonts.inter(
                                   fontSize: 14 * ffem,
                                   fontWeight: FontWeight.w700,
@@ -363,7 +440,7 @@ class _InfoState extends State<Info> {
                           margin: EdgeInsets.fromLTRB(
                               0 * fem, 0 * fem, 0 * fem, 16 * fem),
                           padding: EdgeInsets.fromLTRB(
-                              12.04 * fem, 8 * fem, 10 * fem, 8 * fem),
+                              15.04 * fem, 8 * fem, 15 * fem, 8 * fem),
                           decoration: BoxDecoration(
                             color: Color(0x19e94057),
                             borderRadius: BorderRadius.circular(7 * fem),
@@ -375,15 +452,15 @@ class _InfoState extends State<Info> {
                               Container(
                                 // localtwoEFy (309:5965)
                                 margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 4.04 * fem, 0 * fem),
+                                    0 * fem, 0 * fem, 3.04 * fem, 0 * fem),
                                 child: Icon(Icons.location_on_outlined,
-                                    size: 23, color: Color(0xffe94057)),
+                                    size: 24, color: Color(0xffe94057)),
                               ),
                               Text(
                                 // bole8cF (309:5964)
-                                'Bole',
+                                city,
                                 style: GoogleFonts.lora(
-                                  fontSize: 14 * ffem,
+                                  fontSize: 17 * ffem,
                                   fontWeight: FontWeight.w700,
                                   height: 1.5 * ffem / fem,
                                   color: Color(0xffe94057),
@@ -415,26 +492,6 @@ class _InfoState extends State<Info> {
                           child: Stack(
                             children: [
                               Positioned(
-                                // graphicsdesignervY7 (309:5972)
-                                left: 0 * fem,
-                                top: 35 * fem,
-                                child: Align(
-                                  child: SizedBox(
-                                    width: 121 * fem,
-                                    height: 21 * fem,
-                                    child: Text(
-                                      'Graphics designer',
-                                      style: GoogleFonts.lora(
-                                        fontSize: 24 * ffem,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.5 * ffem / fem,
-                                        color: Color(0xff000000),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
                                 // selamyohannes29nqD (309:5973)
                                 left: 0 * fem,
                                 top: 0 * fem,
@@ -443,12 +500,14 @@ class _InfoState extends State<Info> {
                                     width: 225 * fem,
                                     height: 36 * fem,
                                     child: Text(
-                                      '${widget.selectedPerson.firstName} ${widget.selectedPerson.lastName}, 29',
+                                      '${widget.selectedPerson.firstName} ${widget.selectedPerson.lastName}, ${widget.selectedPerson.age}',
                                       style: GoogleFonts.lora(
                                         fontSize: 24 * ffem,
                                         fontWeight: FontWeight.w700,
                                         height: 1.5 * ffem / fem,
-                                        color: Color(0xff000000),
+                                        color: themeProvider.isDarkMode
+                                            ? Colors.white
+                                            : Color(0xff000000),
                                       ),
                                     ),
                                   ),
@@ -462,139 +521,7 @@ class _InfoState extends State<Info> {
                   ),
                 ),
                 //start
-                Positioned(
-                  // galleryAhD (309:5870)
-                  left: 40 * fem,
-                  top: 929 * fem,
-                  child: Container(
-                    width: 295 * fem,
-                    height: 356 * fem,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          // autogroup6nyv6Ky (TgkGnM1ib9dnydpBSx6NyV)
-                          width: double.infinity,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  child: Text(
-                                    'Gallery',
-                                    style: GoogleFonts.lora(
-                                      fontSize: 24 * ffem,
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.5 * ffem / fem,
-                                      color: Color(0xff000000),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10 * fem,
-                        ),
-                        Container(
-                          // autogrouphxlbchd (TgkGsbMyU4PoMeNEcEHXLb)
-                          width: double.infinity,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                // photoNgo (I309:5871;174:1)
-                                margin: EdgeInsets.fromLTRB(
-                                    0 * fem, 0 * fem, 10 * fem, 0 * fem),
-                                width: 142 * fem,
-                                height: 190 * fem,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                  image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: AssetImage(
-                                        'assets/images/girls/img_2.jpg'),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                // photoqqH (I309:5875;174:1)
-                                width: 143 * fem,
-                                height: 190 * fem,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                  image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: AssetImage(
-                                        'assets/images/girls/img_2.jpg'),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10 * fem,
-                        ),
-                        Container(
-                          // autogroupd3pjj9y (TgkGzbAKJc59CKme9wD3pj)
-                          width: double.infinity,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                // photoGQo (I309:5872;174:1)
-                                width: 92 * fem,
-                                height: 122 * fem,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                  image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: AssetImage(
-                                        'assets/images/girls/img_2.jpg'),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 10 * fem,
-                              ),
-                              Container(
-                                // photoCJT (I309:5873;174:1)
-                                width: 91 * fem,
-                                height: 122 * fem,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                  image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: AssetImage(
-                                        'assets/images/girls/img_2.jpg'),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 10 * fem,
-                              ),
-                              Container(
-                                // photoVYT (I309:5874;174:1)
-                                width: 92 * fem,
-                                height: 122 * fem,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5 * fem),
-                                  image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: AssetImage(
-                                        'assets/images/girls/img_2.jpg'),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+
                 //end
                 Positioned(
                   // buttons7m1 (309:5974)
@@ -625,7 +552,7 @@ class _InfoState extends State<Info> {
                           child: Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Handle close icon tap
+                                disliked();
                               },
                               child: Transform.scale(
                                 scale:
@@ -658,15 +585,18 @@ class _InfoState extends State<Info> {
                               ),
                             ],
                           ),
-                          child: Center(
-                            // like7H9 (309:5977)
-                            child: SizedBox(
-                              width: 42.5 * fem,
-                              height: 36.47 * fem,
-                              child: Icon(
-                                Icons.favorite,
-                                color: Colors.white,
-                                size: 40,
+                          child: GestureDetector(
+                            onTap: liked,
+                            child: Center(
+                              // like7H9 (309:5977)
+                              child: SizedBox(
+                                width: 42.5 * fem,
+                                height: 36.47 * fem,
+                                child: Icon(
+                                  Icons.favorite,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
                               ),
                             ),
                           ),
@@ -693,16 +623,12 @@ class _InfoState extends State<Info> {
                           child: Center(
                             child: GestureDetector(
                               onTap: () {
-                                // Handle close icon tap
+                                liked();
                               },
                               child: Transform.scale(
-                                scale:
-                                    2.0, // Increase the scale factor as needed
+                                scale: 2.0,
                                 child: Icon(Icons.star,
-                                    size: 15 * fem,
-                                    color:
-                                        Color(0xFF8A2387) // Original icon size
-                                    ),
+                                    size: 15 * fem, color: Color(0xFF8A2387)),
                               ),
                             ),
                           ),

@@ -1,3 +1,53 @@
+//test
+// import 'package:fire/services/NotificationService.dart';
+// import 'package:flutter/material.dart';
+
+// class test extends StatefulWidget {
+//   const test({super.key});
+
+//   @override
+//   State<test> createState() => _testState();
+// }
+
+// void notifayMe() {
+//   //final notificationService = NotificationService();
+
+//   // notificationService.sendChatNotification(
+//   //     '2WLo81Xn55PcWbWBWekj0XPvxPl2',
+//   //     'https://firebasestorage.googleapis.com/v0/b/test-7643a.appspot.com/o/profile_pictures%2F2WLo81Xn55PcWbWBWekj0XPvxPl2.jpg?alt=media&token=6f225ba7-b835-4e0d-a043-9e1f7fc77b71',
+//   //     'Hello there!',);
+//   // notificationService.sendMatchNotification(
+//   //     '2WLo81Xn55PcWbWBWekj0XPvxPl2',
+//   //     'https://firebasestorage.googleapis.com/v0/b/test-7643a.appspot.com/o/profile_pictures%2F2WLo81Xn55PcWbWBWekj0XPvxPl2.jpg?alt=media&token=6f225ba7-b835-4e0d-a043-9e1f7fc77b71',
+//   //     'Abel');
+// }
+
+// class _testState extends State<test> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("Notification"),
+//       ),
+//       body: Container(
+//         child: Column(
+//           children: [
+//             Center(
+//               child: Row(
+//                 children: [
+//                   ElevatedButton(onPressed: notifayMe, child: Text("send"))
+//                 ],
+//               ),
+//             )
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+//test end
+
 // import 'package:geolocator/geolocator.dart';
 // import 'package:flutter/material.dart';
 // import 'package:permission_handler/permission_handler.dart';

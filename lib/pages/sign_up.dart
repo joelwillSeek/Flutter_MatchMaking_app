@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:bottom_picker/resources/arrays.dart';
 import 'package:fire/pages/sign_in.dart';
@@ -35,7 +36,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (value == null || value.isEmpty) {
       return 'Please enter your name';
     }
-    final nameReg = RegExp(r'^[a-zA-Z]+$');
+    final nameReg = RegExp(r'^[a-zA-Z]+\s*$', caseSensitive: false);
     if (!nameReg.hasMatch(value)) {
       return 'Please enter a valid name';
     }
@@ -575,7 +576,6 @@ class credentialEmPas extends StatefulWidget {
   final File? img;
   List<String> selectedInterests = [];
   final int age;
-
   credentialEmPas(
       {super.key,
       required this.f,
@@ -594,16 +594,28 @@ class credentialEmPas extends StatefulWidget {
 // ignore: camel_case_types
 class _credentialEmPasState extends State<credentialEmPas> {
   bool _isObscured = true;
+  String? _selectedSubCity;
 
+  final List<String> subCities = [
+    "Arada, Addis Ababa",
+    "Akaky Kaliti, Addis Ababa",
+    "Bole, Addis Ababa",
+    "Gullele, Addis Ababa",
+    "Kirkos, Addis Ababa",
+    "Kolfe Keranio, Addis Ababa",
+    "Lideta, Addis Ababa",
+    "Nifas Silk-Lafto, Addis Ababa",
+    "Yeka, Addis Ababa",
+  ];
   TextEditingController emailCont = TextEditingController();
   TextEditingController password = TextEditingController();
-  TextEditingController searchLoc = TextEditingController();
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your email address';
     }
-    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegExp =
+        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\s*$', caseSensitive: false);
     if (!emailRegExp.hasMatch(value)) {
       return 'Please enter a valid email address';
     }
@@ -621,11 +633,72 @@ class _credentialEmPasState extends State<credentialEmPas> {
   }
 
   final formKey = GlobalKey<FormState>();
+  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   final FirebaseService firebaseService = FirebaseService();
 
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> _signUp() async {
+    if (subCities.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'please select your location!',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 234, 8, 8),
+        ),
+      );
+      return;
+    }
+    if (formKey.currentState!.validate()) {
+      isLoading.value = true;
+
+      User? user = await firebaseService.registerWithEmailAndPassword(
+        email: emailCont.text,
+        password: password.text,
+        firstName: widget.f!,
+        lastName: widget.l!,
+        gender: widget.gen!,
+        profilePic: widget.img,
+        Bio: widget.bio!,
+        address: _selectedSubCity!,
+        age: widget.age,
+        interests: widget.selectedInterests,
+        phoneNum: widget.ph!,
+        verified: false,
+      );
+
+      isLoading.value = false;
+
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const signin()),
+        );
+      } else {
+        // Handle registration failure
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.red,
+              title: const Text('Registration Failed'),
+              content: const Text('Failed to register user.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
   }
 
   @override
@@ -704,12 +777,48 @@ class _credentialEmPasState extends State<credentialEmPas> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  controller: searchLoc,
-                  decoration: InputDecoration(
-                    labelText: 'Location',
-                    hintText: 'Type to search for a location',
-                    prefixIcon: Icon(Icons.location_on),
+                child: Container(
+                  width: 240,
+                  height: 50,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color.fromARGB(49, 11, 9, 10),
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      hint: Text(
+                        'Select Location',
+                        style: TextStyle(
+                          color: Color.fromARGB(178, 3, 3, 3),
+                          fontSize: 16,
+                        ),
+                      ),
+                      value: _selectedSubCity,
+                      icon: Icon(Icons.arrow_drop_down),
+                      iconSize: 24,
+                      elevation: 16,
+                      style: TextStyle(
+                        color: Color.fromARGB(189, 7, 7, 7),
+                        fontSize: 16,
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedSubCity = newValue;
+                        });
+                      },
+                      items: subCities.map<DropdownMenuItem<String>>(
+                        (String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        },
+                      ).toList(),
+                    ),
                   ),
                 ),
               ),
@@ -718,95 +827,20 @@ class _credentialEmPasState extends State<credentialEmPas> {
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (formKey.currentState!.validate()) {
-                      //showMessage();
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SpinKitThreeInOut(
-                                  size: 50.0,
-                                  itemBuilder: (_, int index) {
-                                    return DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(25),
-                                        color: index.isEven
-                                            ? const Color(0xFFE94057)
-                                            : Colors.grey,
-                                      ),
-                                    );
-                                  },
-                                ),
-                                const SizedBox(
-                                    height:
-                                        20), // Add some spacing below the spinner
-                                const Flexible(
-                                  child: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 20),
-                                    child: Text(
-                                      "Please check your mail inbox to verify your email...",
-                                      textAlign: TextAlign
-                                          .center, // Center the text horizontally
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                    if (subCities.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'please select your location!',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Color.fromARGB(255, 234, 8, 8),
+                        ),
                       );
-
-                      User? user =
-                          await firebaseService.registerWithEmailAndPassword(
-                              email: emailCont.text,
-                              password: password.text,
-                              firstName: widget.f!,
-                              lastName: widget.l!,
-                              gender: widget.gen!,
-                              profilePic: widget.img,
-                              verified: false);
-
-                      // ignore: use_build_context_synchronously
-                      Navigator.pop(context); // Close the loading dialog
-
-                      if (user != null) {
-                        // ignore: use_build_context_synchronously
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const signin()),
-                        );
-                      } else {
-                        // Handle registration failure
-                        // ignore: use_build_context_synchronously
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              backgroundColor: Colors.red,
-                              title: const Text('Registration Failed'),
-                              content: const Text('Failed to register user.'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
+                      return;
+                    }
+                    if (formKey.currentState!.validate()) {
+                      _signUp();
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -820,7 +854,64 @@ class _credentialEmPasState extends State<credentialEmPas> {
               ),
             ],
           ),
-        )
+        ),
+        ValueListenableBuilder<bool>(
+          valueListenable: isLoading,
+          builder: (context, value, child) {
+            if (value) {
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: Container(
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SpinKitThreeInOut(
+                          size: 50.0,
+                          itemBuilder: (_, int index) {
+                            return DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: index.isEven
+                                    ? const Color(0xFFE94057)
+                                    : Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        const Flexible(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(
+                              "Please check your mail inbox to verify your email...",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color.fromARGB(171, 26, 15, 15),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return Container();
+            }
+          },
+        ),
       ]),
     );
   }
@@ -830,27 +921,5 @@ class _credentialEmPasState extends State<credentialEmPas> {
     emailCont.dispose();
     password.dispose();
     super.dispose();
-  }
-
-  void showMessage() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Message'),
-          backgroundColor: Color.fromARGB(147, 68, 159, 233),
-          content: const Text(
-              "upon successful account creation you have to verify your email to sign in"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

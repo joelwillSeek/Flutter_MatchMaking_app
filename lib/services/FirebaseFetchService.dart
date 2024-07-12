@@ -7,28 +7,29 @@ class FirebaseFetchService {
     try {
       DocumentSnapshot<Map<String, dynamic>> userSnapshot =
           await _firestore.collection('f_user').doc(userId).get();
+      DocumentSnapshot<Map<String, dynamic>> preferencesSnapshot =
+          await _firestore
+              .collection('f_user')
+              .doc(userId)
+              .collection('preferences')
+              .doc(userId)
+              .get();
 
-      if (userSnapshot.exists) {
-        return userSnapshot.data();
+      if (userSnapshot.exists && preferencesSnapshot.exists) {
+        final userData = userSnapshot.data()!;
+        final preferencesData = preferencesSnapshot.data()!;
+        print("User data retrieved successfully: $userData");
+        print("Preferences data retrieved successfully: $preferencesData");
+        return {
+          'userData': userData,
+          'preferencesData': preferencesData,
+        };
+      } else {
+        print("User data or preferences data does not exist.");
+        return null;
       }
-      return null;
     } catch (e) {
       print("Error fetching user details: $e");
-      return null;
-    }
-  }
-
-  Future<String?> getUserProfileUrl(String userId) async {
-    try {
-      DocumentSnapshot<Map<String, dynamic>> profileSnapshot =
-          await _firestore.collection('user_profile').doc(userId).get();
-
-      if (profileSnapshot.exists) {
-        return profileSnapshot.get('profile_url');
-      }
-      return null;
-    } catch (e) {
-      print("Error fetching user profile URL: $e");
       return null;
     }
   }

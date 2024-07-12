@@ -1,3 +1,4 @@
+import 'package:fire/manager/SettingsProvider.dart';
 import 'package:fire/services/FirebaseService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -35,9 +36,17 @@ class _RequestScreenState extends State<RequestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<SettingsProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Requests'),
+        title: Text('Requests',
+            style: TextStyle(
+                fontFamily: 'Merienda',
+                color: themeProvider.isDarkMode
+                    ? Colors.white
+                    : Colors.grey[900])),
+        backgroundColor:
+            themeProvider.isDarkMode ? Colors.grey[900] : Colors.white,
       ),
       body: Consumer<RequestProvider>(
         builder: (context, requestProvider, child) {
@@ -53,7 +62,7 @@ class _RequestScreenState extends State<RequestScreen> {
                   ? GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.7, // Adjust as needed
+                        childAspectRatio: 0.7,
                       ),
                       itemCount: requestProvider.requests.length,
                       itemBuilder: (context, index) {

@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fire/chat/chat_home.dart';
-import 'package:fire/manager/ThemeProvider.dart';
+import 'package:fire/manager/SettingsProvider.dart';
+import 'package:fire/manager/UserDataManager.dart';
 import 'package:fire/model/message.dart';
 import 'package:fire/services/ChatServices.dart';
 import 'package:fire/services/FirestoreFetcher.dart';
+import 'package:fire/services/NotificationService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,7 +25,9 @@ class ChatRoom extends StatefulWidget {
 class _ChatRoomState extends State<ChatRoom> {
   TextEditingController messageController = TextEditingController();
   final ChatServices _chatServices = ChatServices();
+  final notificationService = NotificationService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
   File? _image;
   void sendMessage() async {
     if (messageController.text.isNotEmpty || _image != null) {
@@ -42,6 +46,12 @@ class _ChatRoomState extends State<ChatRoom> {
     }
   }
 
+  void sendNotification(BuildContext context, String receiverToken,
+      String message, String profile, String senderName) async {
+    notificationService.sendChatNotification(
+        receiverToken, profile, message, senderName);
+  }
+
   bool isOnline = true;
 
   @override
@@ -58,8 +68,7 @@ class _ChatRoomState extends State<ChatRoom> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
+    final themeProvider = Provider.of<SettingsProvider>(context);
     return Scaffold(
       body: Column(
         children: [
@@ -87,10 +96,9 @@ class _ChatRoomState extends State<ChatRoom> {
                 Text(
                   widget.friend.firstName,
                   style: TextStyle(
-                    color: themeProvider.themeMode == ThemeModeType.Dark
-                        ? Colors.green
-                        : Colors.black,
-                    fontSize: 20.0,
+                    color:
+                        themeProvider.isDarkMode ? Colors.green : Colors.black,
+                    fontSize: 17.0,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -122,7 +130,7 @@ class _ChatRoomState extends State<ChatRoom> {
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: themeProvider.themeMode == ThemeModeType.Dark
+                  color: themeProvider.isDarkMode
                       ? Colors.grey[800]
                       : Colors.white,
                   borderRadius: BorderRadius.circular(30),
@@ -143,6 +151,13 @@ class _ChatRoomState extends State<ChatRoom> {
                     GestureDetector(
                       onTap: () {
                         sendMessage();
+                        final me = UserDataManager().me!;
+                        sendNotification(
+                            context,
+                            widget.friend.deviceToken,
+                            messageController.text,
+                            me.profileUrl,
+                            me.firstName);
                       },
                       child: Row(
                         children: [
@@ -163,6 +178,13 @@ class _ChatRoomState extends State<ChatRoom> {
                                       imageFile: _image!,
                                       onSend: () {
                                         sendMessage();
+                                        final me = UserDataManager().me!;
+                                        sendNotification(
+                                            context,
+                                            widget.friend.deviceToken,
+                                            "sent new photo",
+                                            me.profileUrl,
+                                            me.firstName);
                                       },
                                     );
                                   },

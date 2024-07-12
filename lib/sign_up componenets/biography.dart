@@ -83,7 +83,7 @@ class _BioState extends State<Bio> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Tell us about yourself with a few lines.',
+              'Tell us about yourself with a few lines, occupation,personality, what you are looking for?.',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
