@@ -14,8 +14,8 @@ class SocialMediaSignInOption {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final TwitterLogin twitterLogin = TwitterLogin(
-    apiKey: 'Vz3Va3tnfq7Sx1gdj2VFGKkRu',
-    apiSecretKey: '0Ae05pSlLp7E7zFJpQ92RKkWdx8JrcfQbhkp4Ij0zt9fhZkqMX',
+    apiKey: '**********************',
+    apiSecretKey: '******************************',
     redirectURI: 'socialauth://',
   );
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
