@@ -105,11 +105,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _openDatePicker(BuildContext context) {
     BottomPicker.date(
-      title: "Select your birthdate",
+      pickerTitle: Text(
+        "Select your birthdate",
+        style: GoogleFonts.inter(
+            color: Color(0xFFE94057),
+            fontWeight: FontWeight.bold,
+            fontSize: 18),
+      ),
       dateOrder: DatePickerDateOrder.dmy,
       pickerTextStyle: GoogleFonts.lora(
-          color: Color(0xFFE94057), fontWeight: FontWeight.bold, fontSize: 18),
-      titleStyle: GoogleFonts.inter(
           color: Color(0xFFE94057), fontWeight: FontWeight.bold, fontSize: 18),
       onChange: (bd) {
         dob = bd.toString();
@@ -277,17 +281,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     style: ButtonStyle(
                       backgroundColor:
-                          MaterialStateProperty.all(const Color(0xFFfcecef)),
-                      padding: MaterialStateProperty.all(
+                          WidgetStateProperty.all(const Color(0xFFfcecef)),
+                      padding: WidgetStateProperty.all(
                           EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
-                      shape: MaterialStateProperty.all(
+                      shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      overlayColor: MaterialStateProperty.resolveWith<Color>(
+                      overlayColor: WidgetStateProperty.resolveWith<Color>(
                         (states) {
-                          if (states.contains(MaterialState.pressed)) {
+                          if (states.contains(WidgetState.pressed)) {
                             return Colors.blueGrey.shade800;
                           }
                           return Colors.white; // No color change on hover

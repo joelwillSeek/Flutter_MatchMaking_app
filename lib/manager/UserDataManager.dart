@@ -1,4 +1,5 @@
 import 'package:fire/services/FirebaseFetchService.dart';
+import 'package:flutter/material.dart';
 import '../model/Me.dart';
 
 class UserDataManager {
@@ -21,7 +22,6 @@ class UserDataManager {
         final userDataMap = userData['userData'] as Map<String, dynamic>?;
         final preferencesDataMap =
             userData['preferencesData'] as Map<String, dynamic>?;
-
         if (userDataMap != null && preferencesDataMap != null) {
           me = Me.fromFirestore(
             userDataMap,
@@ -41,7 +41,7 @@ class UserDataManager {
         print("User data is null or empty.");
       }
     } catch (e, stackTrace) {
-      print("Error fetching user details: $e");
+      print("Error fetching user details ub getcgyserdata: $e");
       print("StackTrace: $stackTrace");
     }
   }

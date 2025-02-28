@@ -1,4 +1,5 @@
 // import 'package:fire/manager/ChangeNotifier.dart';
+import 'package:fire/manager/ChangeNotifier.dart';
 import 'package:fire/manager/MatchmakingProvider.dart';
 import 'package:fire/manager/SettingsProvider.dart';
 import 'package:fire/manager/UserDataManager.dart';
@@ -11,8 +12,9 @@ import 'package:fire/services/NotificationService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_tinder_swipe/flutter_tinder_swipe.dart';
+//import 'package:flutter_tinder_swipe/flutter_tinder_swipe.dart';
 //import 'package:fire/data/explore_json.dart';
+import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:fire/theme/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:like_button/like_button.dart';
@@ -32,7 +34,8 @@ class _ExplorePageState extends State<ExplorePage> {
   String? _selectedGender;
   final notificationService = NotificationService();
 
-  final CardController cardController = CardController();
+  final CardSwiperController _cardSwiperController = CardSwiperController();
+
   FirebaseService firebaseService = FirebaseService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   @override
@@ -56,7 +59,7 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
   Future<bool> onLikeButtonTapped(bool isLiked) async {
-    cardController.swipeRight();
+    // cardController.swipeRight();
     return !isLiked;
   }
 
@@ -96,12 +99,7 @@ class _ExplorePageState extends State<ExplorePage> {
     return Scaffold(
       body: Consumer<MatchmakingProvider>(builder: (context, provider, child) {
         if (provider.isLoading) {
-          return const Center(
-            child: SpinKitPumpingHeart(
-              size: 100.0,
-              color: Color.fromARGB(255, 204, 72, 89),
-            ),
-          );
+          return loading();
         } else if (provider.errorMessage.isNotEmpty) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             showMessage(provider.errorMessage);
@@ -114,99 +112,12 @@ class _ExplorePageState extends State<ExplorePage> {
                 right: 0,
                 child: Row(
                   children: [
-                    const Expanded(
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Explore',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return FilterBottomSheet(
-                              // me: me,
-                              update: false,
-                              onUpdated: (onUpdated) {
-                                if (onUpdated) {
-                                  print("updating $onUpdated");
-                                  provider.refreshMatches();
-                                }
-                              },
-                              selectedGender: _selectedGender ?? '',
-                              onGenderSelected: (selectedGender) {
-                                setState(() {
-                                  _selectedGender = selectedGender;
-                                });
-                              },
-                            );
-                          },
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            shape: BoxShape.rectangle,
-                            color: themeProvider.isDarkMode
-                                ? const Color.fromARGB(154, 244, 67, 54)
-                                : Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: grey.withOpacity(0.3),
-                                spreadRadius: 5,
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.settings,
-                            size: 30,
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.red,
-                          ),
-                        ),
-                      ),
-                    ),
+                    exploreTextWidget(),
+                    searchFilterBottomSheet(context, provider, themeProvider),
                   ],
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Image.asset('assets/images/icons8-broken-heart.gif'),
-                  ),
-                  Center(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Adjust your preference🤧!",
-                          style:
-                              GoogleFonts.habibi(fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              helpfulTip(),
             ],
           );
         } else if (provider.matches.isEmpty) {
@@ -221,90 +132,16 @@ class _ExplorePageState extends State<ExplorePage> {
                     children: [
                       Row(
                         children: [
-                          const Expanded(
-                            child: Center(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Explore',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return FilterBottomSheet(
-                                    // me: me,
-                                    update: false,
-                                    onUpdated: (onUpdated) {
-                                      if (onUpdated) {
-                                        print("updating $onUpdated");
-                                        provider.refreshMatches();
-                                      }
-                                    },
-                                    selectedGender: _selectedGender ?? '',
-                                    onGenderSelected: (selectedGender) {
-                                      setState(() {
-                                        _selectedGender = selectedGender;
-                                      });
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  shape: BoxShape.rectangle,
-                                  color: themeProvider.isDarkMode
-                                      ? const Color.fromARGB(154, 244, 67, 54)
-                                      : Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: grey.withOpacity(0.3),
-                                      spreadRadius: 5,
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.settings,
-                                  size: 30,
-                                  color: themeProvider.isDarkMode
-                                      ? Colors.white
-                                      : Colors.red,
-                                ),
-                              ),
-                            ),
-                          ),
+                          exploreTextWidget(),
+                          searchFilterBottomSheet(
+                              context, provider, themeProvider),
                         ],
                       ),
                     ],
                   ),
                 ),
               ),
-              Center(
-                child: Text(
-                  "No matches available",
-                  style: TextStyle(
-                      color: Color(0xFFE94057),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16),
-                ),
-              ),
+              noMatchTextWidget(),
             ],
           );
         } else {
@@ -316,82 +153,8 @@ class _ExplorePageState extends State<ExplorePage> {
                 right: 0,
                 child: Row(
                   children: [
-                    Expanded(
-                      child: Center(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Explore',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              provider.matches[i].address,
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // Handle settings button tap
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return FilterBottomSheet(
-                              // me: me,
-                              update: false,
-                              onUpdated: (onUpdated) {
-                                if (onUpdated) {
-                                  print("updating $onUpdated");
-                                  provider.refreshMatches();
-                                }
-                              },
-                              selectedGender: _selectedGender ?? '',
-                              onGenderSelected: (selectedGender) {
-                                setState(() {
-                                  _selectedGender = selectedGender;
-                                });
-                              },
-                            );
-                          },
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            shape: BoxShape.rectangle,
-                            color: themeProvider.isDarkMode
-                                ? const Color.fromARGB(154, 244, 67, 54)
-                                : Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: grey.withOpacity(0.3),
-                                spreadRadius: 5,
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.settings,
-                            size: 30,
-                            color: themeProvider.isDarkMode
-                                ? Colors.white
-                                : Colors.red,
-                          ),
-                        ),
-                      ),
-                    ),
+                    exploreTextWidget(),
+                    searchFilterBottomSheet(context, provider, themeProvider),
                   ],
                 ),
               ),
@@ -401,56 +164,30 @@ class _ExplorePageState extends State<ExplorePage> {
                 right: 0,
                 bottom: 120,
                 child: provider.matches.isEmpty
-                    ? const Center(
-                        child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SpinKitPumpingHeart(
-                            size: 100.0,
-                            color: Color.fromARGB(255, 204, 72, 89),
-                          ),
-                          Text(
-                            "please wait a few minute...",
-                            style: TextStyle(
-                                color: Color(0xFFE94057),
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16),
-                          ),
-                        ],
-                      ))
+                    ? plsWaitWidget()
                     : GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Info(
-                                      selectedPerson: provider.matches[i],
-                                      done: (value) {
-                                        if (value) {
-                                          setState(() {
-                                            provider.matches.removeAt(i);
-                                          });
-                                        }
-                                      },
-                                    )),
-                          );
+                          goToInfopage(context, provider);
                         },
-                        child: SwipeCard(
-                          cardController: cardController,
-                          totalNum: provider.matches.length,
-                          maxWidth: MediaQuery.of(context).size.width * 0.85,
-                          maxHeight: MediaQuery.of(context).size.height * 0.7,
-                          minWidth: MediaQuery.of(context).size.width * 0.75,
-                          minHeight: MediaQuery.of(context).size.height * 0.6,
-                          cardBuilder: (context, index) {
+                        child: CardSwiper(
+                          controller: _cardSwiperController,
+                          cardsCount: provider.matches.length,
+                          numberOfCardsDisplayed: provider.matches.length > 3
+                              ? 3
+                              : provider.matches.length,
+                          // maxWidth: MediaQuery.of(context).size.width * 0.85,
+                          // maxHeight: MediaQuery.of(context).size.height * 0.7,
+                          // minWidth: MediaQuery.of(context).size.width * 0.75,
+                          // minHeight: MediaQuery.of(context).size.height * 0.6,
+                          cardBuilder: (context, index, horizontalThreshold,
+                              verticalThreshold) {
                             i = index;
                             return Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: grey.withOpacity(0.3),
+                                    color: grey.withValues(alpha: 0.3),
                                     blurRadius: 5,
                                     spreadRadius: 2,
                                   ),
@@ -460,25 +197,15 @@ class _ExplorePageState extends State<ExplorePage> {
                                 borderRadius: BorderRadius.circular(10),
                                 child: Stack(
                                   children: [
-                                    Container(
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: NetworkImage(provider
-                                              .matches[index].profileImageUrl),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
+                                    profileImageWidget(provider, index),
                                     Container(
                                       width: double.infinity,
                                       height: double.infinity,
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
-                                            black.withOpacity(0.25),
-                                            black.withOpacity(0),
+                                            black.withValues(alpha: 0.25),
+                                            black.withValues(alpha: 0),
                                           ],
                                           end: Alignment.topCenter,
                                           begin: Alignment.bottomCenter,
@@ -492,22 +219,9 @@ class _ExplorePageState extends State<ExplorePage> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           children: [
-                                            Text(
-                                              provider.matches[index].firstName,
-                                              style: TextStyle(
-                                                color: white,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                            firstNameWidget(provider, index),
                                             SizedBox(height: 5),
-                                            Text(
-                                              provider.matches[index].lastName,
-                                              style: TextStyle(
-                                                color: white,
-                                                fontSize: 16,
-                                              ),
-                                            ),
+                                            lastNameWidget(provider, index),
                                             SizedBox(height: 5),
                                             Row(
                                               children: [
@@ -520,13 +234,7 @@ class _ExplorePageState extends State<ExplorePage> {
                                                   ),
                                                 ),
                                                 SizedBox(width: 5),
-                                                Text(
-                                                  "Recently Active",
-                                                  style: TextStyle(
-                                                    color: white,
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
+                                                recentlyActiveTextWidget(),
                                               ],
                                             ),
                                             SizedBox(height: 10),
@@ -543,8 +251,8 @@ class _ExplorePageState extends State<ExplorePage> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             30),
-                                                    color:
-                                                        white.withOpacity(0.4),
+                                                    color: white.withValues(
+                                                        alpha: .4),
                                                   ),
                                                   padding: EdgeInsets.symmetric(
                                                     vertical: 3,
@@ -567,19 +275,20 @@ class _ExplorePageState extends State<ExplorePage> {
                               ),
                             );
                           },
-                          swipeUpdateCallback:
-                              (DragUpdateDetails details, Alignment align) {
-                            if (align.x < 0) {
-                              //Card is LEFT swiping
-                              // print("disliked: ${itemsTemp[i].firstName}");
-                            } else if (align.x > 0) {
-                              //Card is RIGHT swiping
-                              // print("liked: ${itemsTemp[i].firstName}");
-                            }
-                          },
-                          swipeCompleteCallback:
-                              (CardSwipeOrientation orientation, int index) {
-                            if (orientation == CardSwipeOrientation.LEFT) {
+                          // swipeUpdateCallback:
+                          //     (DragUpdateDetails details, Alignment align) {
+                          //   if (align.x < 0) {
+                          //     //Card is LEFT swiping
+                          //     // print("disliked: ${itemsTemp[i].firstName}");
+                          //   } else if (align.x > 0) {
+                          //     //Card is RIGHT swiping
+                          //     // print("liked: ${itemsTemp[i].firstName}");
+                          //   }
+                          // },
+                          onSwipe: (previousIndex, currentIndex, direction) {
+                            if (direction.name != "left" ||
+                                direction.name != "right") return false;
+                            if (direction.name == "left") {
                               // print("disliked: ${provider.matches[index].firstName}");
                               User? user = _auth.currentUser;
                               String userId = user!.uid;
@@ -589,8 +298,9 @@ class _ExplorePageState extends State<ExplorePage> {
                               // if (itemsTemp.length - 1 == i) {
                               //   showMessage("oups -1== $i");
                               // } //useless
-                            } else if (orientation ==
-                                CardSwipeOrientation.RIGHT) {
+
+                              return true;
+                            } else if (direction.name == "right") {
                               // print("liked: ${provider.matches[index].firstName}");
                               User? user = _auth.currentUser;
                               String userId = user!.uid;
@@ -610,10 +320,14 @@ class _ExplorePageState extends State<ExplorePage> {
                               // if (itemsTemp.length - 1 == i) {
                               //   showMessage("oups -1== $i");
                               // }//useless
+
+                              return true;
                             }
                             setState(() {
                               provider.matches.removeAt(i);
                             });
+
+                            return false;
                           },
                         ),
                       ),
@@ -634,7 +348,8 @@ class _ExplorePageState extends State<ExplorePage> {
                         GestureDetector(
                           onTap: () {
                             // Dislike action
-                            cardController.swipeLeft();
+                            _cardSwiperController
+                                .swipe(CardSwiperDirection.left);
                           },
                           child: Container(
                             padding: EdgeInsets.all(9),
@@ -643,7 +358,7 @@ class _ExplorePageState extends State<ExplorePage> {
                               color: Colors.white,
                               boxShadow: [
                                 BoxShadow(
-                                  color: grey.withOpacity(0.1),
+                                  color: grey.withValues(alpha: 0.1),
                                   spreadRadius: 5,
                                   blurRadius: 10,
                                 ),
@@ -658,7 +373,8 @@ class _ExplorePageState extends State<ExplorePage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            cardController.swipeRight();
+                            _cardSwiperController
+                                .swipe(CardSwiperDirection.right);
                           },
                           child: Container(
                             padding: EdgeInsets.all(14),
@@ -701,7 +417,8 @@ class _ExplorePageState extends State<ExplorePage> {
                         GestureDetector(
                           onTap: () {
                             // Like action
-                            cardController.swipeRight();
+                            _cardSwiperController
+                                .swipe(CardSwiperDirection.right);
                           },
                           child: Container(
                             padding: EdgeInsets.all(9),
@@ -732,6 +449,206 @@ class _ExplorePageState extends State<ExplorePage> {
           );
         }
       }),
+    );
+  }
+
+  Text recentlyActiveTextWidget() {
+    return Text(
+      "Recently Active",
+      style: TextStyle(
+        color: white,
+        fontSize: 14,
+      ),
+    );
+  }
+
+  Text lastNameWidget(MatchmakingProvider provider, int index) {
+    return Text(
+      provider.matches[index].lastName,
+      style: TextStyle(
+        color: white,
+        fontSize: 16,
+      ),
+    );
+  }
+
+  Text firstNameWidget(MatchmakingProvider provider, int index) {
+    return Text(
+      provider.matches[index].firstName,
+      style: TextStyle(
+        color: white,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Container profileImageWidget(MatchmakingProvider provider, int index) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(provider.matches[index].profileImageUrl),
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  void goToInfopage(BuildContext context, MatchmakingProvider provider) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Info(
+                selectedPerson: provider.matches[i],
+                done: (value) {
+                  if (value) {
+                    setState(() {
+                      provider.matches.removeAt(i);
+                    });
+                  }
+                },
+              )),
+    );
+  }
+
+  Center plsWaitWidget() {
+    return const Center(
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SpinKitPumpingHeart(
+          size: 100.0,
+          color: Color.fromARGB(255, 204, 72, 89),
+        ),
+        Text(
+          "please wait a few minute...",
+          style: TextStyle(
+              color: Color(0xFFE94057),
+              fontWeight: FontWeight.w700,
+              fontSize: 16),
+        ),
+      ],
+    ));
+  }
+
+  Center noMatchTextWidget() {
+    return Center(
+      child: Text(
+        "No matches available",
+        style: TextStyle(
+            color: Color(0xFFE94057),
+            fontWeight: FontWeight.w700,
+            fontSize: 16),
+      ),
+    );
+  }
+
+  Column helpfulTip() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Center(
+          child: Image.asset('assets/images/icons8-broken-heart.gif'),
+        ),
+        Center(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Adjust your preference🤧!",
+                style: GoogleFonts.habibi(fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  GestureDetector searchFilterBottomSheet(BuildContext context,
+      MatchmakingProvider provider, SettingsProvider themeProvider) {
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) {
+            return FilterBottomSheet(
+              // me: me,
+              update: false,
+              onUpdated: (onUpdated) {
+                if (onUpdated) {
+                  print("updating $onUpdated");
+                  provider.refreshMatches();
+                }
+              },
+              selectedGender: _selectedGender ?? '',
+              onGenderSelected: (selectedGender) {
+                setState(() {
+                  _selectedGender = selectedGender;
+                });
+              },
+            );
+          },
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(right: 4),
+        child: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            shape: BoxShape.rectangle,
+            color: themeProvider.isDarkMode
+                ? const Color.fromARGB(154, 244, 67, 54)
+                : Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: grey.withOpacity(0.3),
+                spreadRadius: 5,
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.settings,
+            size: 30,
+            color: themeProvider.isDarkMode ? Colors.white : Colors.red,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Expanded exploreTextWidget() {
+    return const Expanded(
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Explore',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Center loading() {
+    return const Center(
+      child: SpinKitPumpingHeart(
+        size: 100.0,
+        color: Color.fromARGB(255, 204, 72, 89),
+      ),
     );
   }
 

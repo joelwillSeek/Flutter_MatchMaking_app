@@ -19,9 +19,9 @@ final darkTheme = ThemeData.dark().copyWith(
 
   // Define text theme
   textTheme: TextTheme(
-    headline6: TextStyle(color: Colors.white), // Headline text color
-    bodyText2: TextStyle(color: Colors.white70), // Body text color
-    button: TextStyle(color: Colors.white), // Button text color
+    headlineSmall: TextStyle(color: Colors.white), // Headline text color
+    headlineLarge: TextStyle(color: Colors.white70), // Body text color
+    bodyMedium: TextStyle(color: Colors.white), // Button text color
   ),
 
   // Define input decoration theme for text fields

@@ -8,7 +8,7 @@ import 'package:fire/services/SocialMediaSignInOption.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:vibration/vibration.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../biography.dart';
@@ -236,8 +236,8 @@ class _mBioState extends State<mBio> {
   }
 
   void _vibrate() async {
-    if (await Vibrate.canVibrate) {
-      Vibrate.vibrate();
+    if (await Vibration.hasVibrator()) {
+      Vibration.vibrate();
     }
   }
 
@@ -510,11 +510,13 @@ class _otherInfoState extends State<otherInfo> {
 
   void _openDatePicker(BuildContext context) {
     BottomPicker.date(
-      title: "Select your birthdate",
+      pickerTitle: Text("Select your birthdate",
+          style: GoogleFonts.inter(
+              color: Color(0xFFE94057),
+              fontWeight: FontWeight.bold,
+              fontSize: 18)),
       dateOrder: DatePickerDateOrder.dmy,
       pickerTextStyle: GoogleFonts.lora(
-          color: Color(0xFFE94057), fontWeight: FontWeight.bold, fontSize: 18),
-      titleStyle: GoogleFonts.inter(
           color: Color(0xFFE94057), fontWeight: FontWeight.bold, fontSize: 18),
       onChange: (bd) {
         dob = bd.toString();
@@ -611,17 +613,17 @@ class _otherInfoState extends State<otherInfo> {
                 ),
                 style: ButtonStyle(
                   backgroundColor:
-                      MaterialStateProperty.all(const Color(0xFFfcecef)),
-                  padding: MaterialStateProperty.all(
+                      WidgetStateProperty.all(const Color(0xFFfcecef)),
+                  padding: WidgetStateProperty.all(
                       EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
-                  shape: MaterialStateProperty.all(
+                  shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                  overlayColor: MaterialStateProperty.resolveWith<Color>(
+                  overlayColor: WidgetStateProperty.resolveWith<Color>(
                     (states) {
-                      if (states.contains(MaterialState.pressed)) {
+                      if (states.contains(WidgetState.pressed)) {
                         return Colors.blueGrey.shade800;
                       }
                       return Colors.white; // No color change on hover

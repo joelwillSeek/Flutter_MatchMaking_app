@@ -4,7 +4,8 @@ import 'package:fire/pages/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_vibrate/flutter_vibrate.dart';
+//import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:vibration/vibration.dart';
 
 // ignore: must_be_immutable
 class Bio extends StatefulWidget {
@@ -66,8 +67,8 @@ class _BioState extends State<Bio> {
   }
 
   void _vibrate() async {
-    if (await Vibrate.canVibrate) {
-      Vibrate.vibrate();
+    if (await Vibration.hasVibrator()) {
+      Vibration.vibrate();
     }
   }
 

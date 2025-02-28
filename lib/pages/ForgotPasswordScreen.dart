@@ -87,7 +87,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Color(0xFFE94057)),
+                        WidgetStateProperty.all<Color>(Color(0xFFE94057)),
                   ),
                 ),
                 const Text(

@@ -4,15 +4,15 @@ import 'package:fire/manager/SettingsProvider.dart';
 // import 'package:fire/manager/SettingsProvider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+//import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart' as http;
 // import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  // final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+  //     FlutterLocalNotificationsPlugin();
   NotificationService() {
     _initializeLocalNotifications();
     _firebaseMessaging.setForegroundNotificationPresentationOptions(
@@ -44,13 +44,13 @@ class NotificationService {
   }
 
   void _initializeLocalNotifications() {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    // const AndroidInitializationSettings initializationSettingsAndroid =
+    //     AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+    // final InitializationSettings initializationSettings =
+    //     InitializationSettings(android: initializationSettingsAndroid);
 
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    // _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   void handleNotification(RemoteMessage message) async {
@@ -82,37 +82,37 @@ class NotificationService {
     print("show match called");
     Uint8List? bigPicture = await _downloadImage(imageUrl);
 
-    BigPictureStyleInformation? bigPictureStyleInformation;
-    if (bigPicture != null) {
-      bigPictureStyleInformation = BigPictureStyleInformation(
-        ByteArrayAndroidBitmap(bigPicture),
-        largeIcon: ByteArrayAndroidBitmap(bigPicture),
-        contentTitle: title,
-        summaryText: body,
-      );
-    }
+    // BigPictureStyleInformation? bigPictureStyleInformation;
+    // if (bigPicture != null) {
+    //   bigPictureStyleInformation = BigPictureStyleInformation(
+    //     ByteArrayAndroidBitmap(bigPicture),
+    //     largeIcon: ByteArrayAndroidBitmap(bigPicture),
+    //     contentTitle: title,
+    //     summaryText: body,
+    //   );
+    // }
 
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'match_channel',
-      'Match Notification',
-      channelDescription: 'Notifications for new matches',
-      importance: Importance.max,
-      priority: Priority.high,
-      styleInformation: bigPictureStyleInformation,
-      showWhen: false,
-    );
+    // final AndroidNotificationDetails androidPlatformChannelSpecifics =
+    //     AndroidNotificationDetails(
+    //   'match_channel',
+    //   'Match Notification',
+    //   channelDescription: 'Notifications for new matches',
+    //   importance: Importance.max,
+    //   priority: Priority.high,
+    //   styleInformation: bigPictureStyleInformation,
+    //   showWhen: false,
+    // );
 
-    final NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    // final NotificationDetails platformChannelSpecifics =
+    //     NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    await _flutterLocalNotificationsPlugin.show(
-      data.hashCode,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: data['route'],
-    );
+    // await _flutterLocalNotificationsPlugin.show(
+    //   data.hashCode,
+    //   title,
+    //   body,
+    //   platformChannelSpecifics,
+    //   payload: data['route'],
+    // );
   }
 
   Future<void> _showChatNotification(Map<String, dynamic> data) async {
@@ -121,53 +121,53 @@ class NotificationService {
     String imageUrl = data['senderProfilePic'];
     print("show chat called");
     Uint8List? largeIcon = await _downloadImage(imageUrl);
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'chat_channel',
-      'Chat Notification',
-      channelDescription: 'Notifications for new chat messages',
-      importance: Importance.max,
-      priority: Priority.high,
-      largeIcon: largeIcon != null ? ByteArrayAndroidBitmap(largeIcon) : null,
-      showWhen: false,
-    );
+    // final AndroidNotificationDetails androidPlatformChannelSpecifics =
+    //     AndroidNotificationDetails(
+    //   'chat_channel',
+    //   'Chat Notification',
+    //   channelDescription: 'Notifications for new chat messages',
+    //   importance: Importance.max,
+    //   priority: Priority.high,
+    //   largeIcon: largeIcon != null ? ByteArrayAndroidBitmap(largeIcon) : null,
+    //   showWhen: false,
+    // );
 
-    final NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    // final NotificationDetails platformChannelSpecifics =
+    //     NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    await _flutterLocalNotificationsPlugin.show(
-      data.hashCode,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: data['route'],
-    );
+    // await _flutterLocalNotificationsPlugin.show(
+    //   data.hashCode,
+    //   title,
+    //   body,
+    //   platformChannelSpecifics,
+    //   payload: data['route'],
+    // );
   }
 
   Future<void> _showDefaultNotification(RemoteMessage message) async {
     String? title = message.notification?.title;
     String? body = message.notification?.body;
 
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'default_channel',
-      'Default Notification',
-      channelDescription: 'Default notifications',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-    );
+    // final AndroidNotificationDetails androidPlatformChannelSpecifics =
+    //     AndroidNotificationDetails(
+    //   'default_channel',
+    //   'Default Notification',
+    //   channelDescription: 'Default notifications',
+    //   importance: Importance.max,
+    //   priority: Priority.high,
+    //   showWhen: false,
+    // );
 
-    final NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    // final NotificationDetails platformChannelSpecifics =
+    //     NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    await _flutterLocalNotificationsPlugin.show(
-      message.hashCode,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: message.data['route'],
-    );
+    // await _flutterLocalNotificationsPlugin.show(
+    //   message.hashCode,
+    //   title,
+    //   body,
+    //   platformChannelSpecifics,
+    //   payload: message.data['route'],
+    // );
   }
 
   Future<Uint8List?> _downloadImage(String url) async {

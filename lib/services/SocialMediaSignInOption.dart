@@ -6,18 +6,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:twitter_login/twitter_login.dart';
+//import 'package:twitter_login/twitter_login.dart';
 
 //import 'package:the_apple_sign_in/the_apple_sign_in.dart';
 
 class SocialMediaSignInOption {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  final TwitterLogin twitterLogin = TwitterLogin(
-    apiKey: '**********************',
-    apiSecretKey: '******************************',
-    redirectURI: 'socialauth://',
-  );
+//  // final TwitterLogin twitterLogin = TwitterLogin(
+//     apiKey: '**********************',
+//     apiSecretKey: '******************************',
+//     redirectURI: 'socialauth://',
+//   );
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseService firebaseService = FirebaseService();
 
@@ -124,51 +124,51 @@ class SocialMediaSignInOption {
     }
   }
 
-  Future<void> signInWithX(BuildContext context) async {
-    try {
-      final authResult = await twitterLogin.loginV2();
-      if (authResult.status == TwitterLoginStatus.loggedIn) {
-        try {
-          final credential = TwitterAuthProvider.credential(
-              accessToken: authResult.authToken!,
-              secret: authResult.authTokenSecret!);
-          final UserCredential res =
-              await _auth.signInWithCredential(credential);
-          final User? user = res.user;
-          if (user != null) {
-            final docSnapshot =
-                await _firestore.collection('f_user').doc(user.uid).get();
+  // Future<void> signInWithX(BuildContext context) async {
+  //   try {
+  //     final authResult = await twitterLogin.loginV2();
+  //     if (authResult.status == TwitterLoginStatus.loggedIn) {
+  //       try {
+  //         final credential = TwitterAuthProvider.credential(
+  //             accessToken: authResult.authToken!,
+  //             secret: authResult.authTokenSecret!);
+  //         final UserCredential res =
+  //             await _auth.signInWithCredential(credential);
+  //         final User? user = res.user;
+  //         if (user != null) {
+  //           final docSnapshot =
+  //               await _firestore.collection('f_user').doc(user.uid).get();
 
-            if (docSnapshot.exists) {
-              Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()))
-                  .then((value) {
-                firebaseService.updateDeviceToken(user.uid);
-              });
-            } else {
-              final userData = UserData(
-                userId: user.uid,
-                firstName: user.displayName?.split(' ')[0],
-                lastName: user.displayName?.split(' ')[1],
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                profilePicUrl: user.photoURL,
-                emailVerified: user.emailVerified,
-              );
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SocialMediaForm(
-                            userData: userData,
-                          )));
-            }
-          }
-        } catch (e) {}
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+  //           if (docSnapshot.exists) {
+  //             Navigator.push(context,
+  //                     MaterialPageRoute(builder: (context) => HomeScreen()))
+  //                 .then((value) {
+  //               firebaseService.updateDeviceToken(user.uid);
+  //             });
+  //           } else {
+  //             final userData = UserData(
+  //               userId: user.uid,
+  //               firstName: user.displayName?.split(' ')[0],
+  //               lastName: user.displayName?.split(' ')[1],
+  //               email: user.email,
+  //               phoneNumber: user.phoneNumber,
+  //               profilePicUrl: user.photoURL,
+  //               emailVerified: user.emailVerified,
+  //             );
+  //             Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                     builder: (context) => SocialMediaForm(
+  //                           userData: userData,
+  //                         )));
+  //           }
+  //         }
+  //       } catch (e) {}
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   // Future<void> signInWithApple(BuildContext context) async {
   //   TheAppleSignIn();

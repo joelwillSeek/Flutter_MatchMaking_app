@@ -129,7 +129,7 @@ class _PhoneNumberRegistrationFormState
                       _validatePhoneNumber(context);
                     },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
+                      backgroundColor: WidgetStateProperty.all<Color>(
                         Color(0xFFE94057),
                       ),
                     ),

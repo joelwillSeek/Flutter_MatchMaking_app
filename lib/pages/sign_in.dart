@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:fire/pages/ForgotPasswordScreen.dart';
 import 'package:fire/pages/home.dart';
 import 'package:fire/pages/sign_up.dart';
@@ -12,8 +11,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rive/rive.dart';
-
+import 'package:rive/rive.dart' as rive;
 import '../services/FirebaseService.dart';
 
 // ignore: camel_case_types
@@ -109,7 +107,7 @@ class _signinState extends State<signin> {
       child: Scaffold(
         body: Stack(
           children: [
-            const RiveAnimation.asset("assets/rive_assets/shapes.riv"),
+            const rive.RiveAnimation.asset("assets/rive_assets/shapes.riv"),
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 20, sigmaY: 10),
@@ -175,8 +173,12 @@ class _signinState extends State<signin> {
                               color: Color(0xFFE94057),
                             ),
                             onPressed: () async {
-                              await _socialMediaSignInOption
-                                  .signInWithX(context);
+                              // await _socialMediaSignInOption
+                              //     .signInWithX(context);
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("Coming Soon!!!"),
+                              ));
                             },
                           ),
                           // IconButton(

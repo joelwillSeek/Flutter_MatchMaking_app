@@ -12,7 +12,28 @@
           "package_name": "com.example.fire"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "352249299975-2m61jd1g9313uh9pbmc48n5a4qn63pho.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fire",
+            "certificate_hash": "a5b9f80ee9d64e5c6a09cd8826ca7cb763d93365"
+          }
+        },
+        {
+          "client_id": "352249299975-df4n1foqgs2qofeab7dm3o5rv3mj385n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fire",
+            "certificate_hash": "0e442ac02995955def6c918a2586e8fe3de33298"
+          }
+        },
+        {
+          "client_id": "352249299975-kvpbr0nib2ff8vp24vkcvmgkqul106v1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCAWeTYXA4xQVd_IU9Xpb7HLgkwnYwg3WU"
@@ -20,7 +41,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "352249299975-kvpbr0nib2ff8vp24vkcvmgkqul106v1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "352249299975-16acf5e13fh30hgbgjbcaoq88orcedd0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fire.RunnerTests"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +64,20 @@
           "package_name": "com.example.mybackfourapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "352249299975-9gimh6ovs0qa2cs26sap1q9bdk0ng7ni.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mybackfourapp",
+            "certificate_hash": "5000c352b9b424cbb2b4ea4d5328332bab0cbfac"
+          }
+        },
+        {
+          "client_id": "352249299975-kvpbr0nib2ff8vp24vkcvmgkqul106v1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCAWeTYXA4xQVd_IU9Xpb7HLgkwnYwg3WU"
@@ -39,7 +85,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "352249299975-kvpbr0nib2ff8vp24vkcvmgkqul106v1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "352249299975-16acf5e13fh30hgbgjbcaoq88orcedd0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fire.RunnerTests"
+              }
+            }
+          ]
         }
       }
     }

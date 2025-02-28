@@ -22,7 +22,7 @@ class ProfileProvider extends ChangeNotifier {
       }
     } catch (e) {
       isError = true;
-      print("Error fetching user details: $e");
+      print("Error fetching user details in chagne notifier: $e");
     } finally {
       isLoading = false;
       notifyListeners();

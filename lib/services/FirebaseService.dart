@@ -290,17 +290,13 @@ class FirebaseService {
       String? fcmToken = await messaging.getToken();
       print('FCM Token: $fcmToken'); // For debugging purposes
 
-      if (fcmToken != null) {
-        String userId = uid;
-        await FirebaseFirestore.instance
-            .collection('f_user')
-            .doc(userId)
-            .set({'deviceToken': fcmToken}, SetOptions(merge: true));
+      String userId = uid;
+      await FirebaseFirestore.instance
+          .collection('f_user')
+          .doc(userId)
+          .set({'deviceToken': fcmToken}, SetOptions(merge: true));
 
-        print('Device token updated successfully');
-      } else {
-        print('FCM token is null');
-      }
+      print('Device token updated successfully');
     } catch (e) {
       print('Error updating device token: $e');
     }

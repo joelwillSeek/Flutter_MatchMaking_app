@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fire/theme/darkTheme.dart';
-
 import 'manager/RequestProvider.dart';
 
 int? isViewed;
@@ -44,6 +43,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> rootNavigatorKey =
       GlobalKey<NavigatorState>();
+
   MyApp({Key? key}) : super(key: key);
   static GlobalKey<NavigatorState> getRootNavigatorKey(BuildContext context) {
     final MyApp myApp = context.findAncestorWidgetOfExactType<MyApp>()!;
